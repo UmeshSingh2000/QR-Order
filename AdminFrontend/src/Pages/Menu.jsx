@@ -9,7 +9,7 @@ const Menu = () => {
   const [editingItem, setEditingItem] = useState(null);
   const [newSectionName, setNewSectionName] = useState("");
   const [newItemName, setNewItemName] = useState("");
-  const [newPrices, setNewPrices] = useState({ small: "", medium: "", large: "" });
+  const [priceInputs, setPriceInputs] = useState([{ key: "", value: "" }]);
 
   useEffect(() => {
     const fetchMenuData = async () => {
@@ -23,28 +23,20 @@ const Menu = () => {
     fetchMenuData();
   }, []);
 
-  const addSection = () => {
-    if (newSectionName.trim()) {
-      const newSection = {
-        _id: Date.now().toString(),
-        sectionname: newSectionName,
-        menuitems: [],
-      };
-      setSections([...sections, newSection]);
+  const addSection = async(sectionname) => {
+    try{
+    const response = await axios.post(`${baseurl}/menu/createSection`, { sectionname: newSectionName });
+    if (response.status === 201) {
+      setSections([...sections, { _id: Date.now().toString(), sectionname: newSectionName, menuitems: [] }]);
       setNewSectionName("");
     }
-  };
+  } catch (error) {
+    console.error("Error creating section:", error);
+  }
+};
 
-  const deleteSection = async (sectionname) => {
-    try {
-      const response = await axios.delete(`${baseurl}/menu/deleteSection/${sectionname}`);
-      if (response.status === 200) {
-        setSections(sections.filter(section => section.sectionname !== sectionname));
-      }
-    }
-    catch (error) {
-      console.error("Error deleting section:", error);
-    }
+  const deleteSection = (sectionId) => {
+    setSections(sections.filter((section) => section._id !== sectionId));
   };
 
   const updateSectionName = (sectionId, newName) => {
@@ -56,51 +48,40 @@ const Menu = () => {
     setEditingSection(null);
   };
 
-  const addItem = (sectionId) => {
-    if (!newItemName.trim()) return;
-
-    const price = {};
-    Object.entries(newPrices).forEach(([key, val]) => {
-      if (val) price[key] = parseFloat(val);
-    });
-
-    const newItem = {
-      _id: Date.now().toString(),
-      itemname: newItemName,
-      price,
-    };
-
-    setSections(
-      sections.map((section) =>
-        section._id === sectionId
-          ? { ...section, menuitems: [...section.menuitems, newItem] }
-          : section
-      )
-    );
-
-    setNewItemName("");
-    setNewPrices({ small: "", medium: "", large: "" });
-  };
-
-  const deleteItem = async (sectionname, itemname) => {
-    try {
-      const response = await axios.delete(`${baseurl}/menu/deleteMenuItem/${sectionname}/${itemname}`);
-      if (response.status === 200) {
+  const addItem = (sectionname,itemname,price) => {
+    try{
+      const response = axios.post(`${baseurl}/menu/addMenuItem`, {
+        sectionname,
+        itemname,
+        price: Object.fromEntries(priceInputs.map(input => [input.key, parseFloat(input.value)]))
+      });
+      if (response.status === 201) {
         setSections(
           sections.map((section) =>
-            section.sectionname === sectionname
-              ? {
-                ...section,
-                menuitems: section.menuitems.filter((item) => item.itemname !== itemname),
-              }
+            section._id === sectionId
+              ? { ...section, menuitems: [...section.menuitems, response.data] }
               : section
           )
         );
+        setNewItemName("");
+        setPriceInputs([{ key: "", value: "" }]);
       }
+    } catch (error) {
+      console.error("Error adding item:", error);
     }
-    catch (error) {
-      console.error("Error deleting menu item:", error);
-    }
+  };
+
+  const deleteItem = (sectionId, itemId) => {
+    setSections(
+      sections.map((section) =>
+        section._id === sectionId
+          ? {
+              ...section,
+              menuitems: section.menuitems.filter((item) => item._id !== itemId),
+            }
+          : section
+      )
+    );
   };
 
   const updateItem = (sectionId, itemId, newName, updatedPrices) => {
@@ -108,13 +89,11 @@ const Menu = () => {
       sections.map((section) =>
         section._id === sectionId
           ? {
-            ...section,
-            menuitems: section.menuitems.map((item) =>
-              item._id === itemId
-                ? { ...item, itemname: newName, price: updatedPrices }
-                : item
-            ),
-          }
+              ...section,
+              menuitems: section.menuitems.map((item) =>
+                item._id === itemId ? { ...item, itemname: newName, price: updatedPrices } : item
+              ),
+            }
           : section
       )
     );
@@ -123,29 +102,27 @@ const Menu = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">Menu Builder</h1>
 
-        <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
-          <div className="flex gap-2">
-            <input
-              type="text"
-              placeholder="Section name (e.g., Pizzas)"
-              value={newSectionName}
-              onChange={(e) => setNewSectionName(e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-            />
-            <button
-              onClick={addSection}
-              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-            >
-              <Plus size={16} />
-            </button>
-          </div>
+        <div className="bg-white rounded-lg shadow-sm p-4 mb-6 flex gap-2">
+          <input
+            type="text"
+            placeholder="Section name"
+            value={newSectionName}
+            onChange={(e) => setNewSectionName(e.target.value)}
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+          />
+          <button
+            onClick={() => addSection(newSectionName)}
+            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+          >
+            <Plus size={16} />
+          </button>
         </div>
 
         {sections.map((section) => (
-          <div key={section._id} className="bg-white rounded-lg shadow-sm mb-6">
+          <div key={section._id} className="bg-white rounded-lg shadow-sm mb-6 overflow-hidden">
             <div className="bg-gray-100 p-4 border-b">
               {editingSection === section._id ? (
                 <div className="flex gap-2">
@@ -162,10 +139,7 @@ const Menu = () => {
                   >
                     <Check size={16} />
                   </button>
-                  <button
-                    onClick={() => setEditingSection(null)}
-                    className="text-gray-600 hover:text-gray-800"
-                  >
+                  <button onClick={() => setEditingSection(null)} className="text-gray-600 hover:text-gray-800">
                     <X size={16} />
                   </button>
                 </div>
@@ -173,16 +147,10 @@ const Menu = () => {
                 <div className="flex justify-between items-center">
                   <h2 className="font-semibold text-gray-800">{section.sectionname}</h2>
                   <div className="flex gap-2">
-                    {/* <button
-                      onClick={() => setEditingSection(section._id)}
-                      className="text-blue-600 hover:text-blue-800"
-                    >
+                    <button onClick={() => setEditingSection(section._id)} className="text-blue-600">
                       <Edit3 size={16} />
-                    </button> */}
-                    <button
-                      onClick={() => deleteSection(section.sectionname)}
-                      className="text-red-600 hover:text-red-800"
-                    >
+                    </button>
+                    <button onClick={() => deleteSection(section._id)} className="text-red-600">
                       <Trash2 size={16} />
                     </button>
                   </div>
@@ -190,120 +158,114 @@ const Menu = () => {
               )}
             </div>
 
-            <div className="p-4 overflow-x-auto">
-              {section.menuitems.length > 0 && (() => {
-                const sizeLabels = Array.from(
-                  new Set(section.menuitems.flatMap(item => Object.keys(item.price || {})))
-                );
-
-                return (
-                  <table className="w-full text-sm text-left text-gray-700 border border-gray-200 rounded-md">
-                    <thead className="bg-gray-100 text-gray-800 font-semibold">
-                      <tr>
-                        <th className="px-4 py-2">Item Name</th>
-                        {sizeLabels.map(size => (
-                          <th key={size} className="px-4 py-2 capitalize">{size}</th>
-                        ))}
-                        <th className="px-4 py-2 text-right">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {section.menuitems.map(item => (
-                        <tr key={item._id} className="border-t">
-                          {editingItem === item._id ? (
-                            <>
-                              <td className="px-4 py-2">
-                                <input
-                                  type="text"
-                                  defaultValue={item.itemname}
-                                  className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
-                                />
-                              </td>
-                              {sizeLabels.map(size => (
-                                <td key={size} className="px-4 py-2">
-                                  <input
-                                    type="number"
-                                    defaultValue={item.price[size] || ""}
-                                    placeholder={size}
-                                    className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
-                                  />
-                                </td>
-                              ))}
-                              <td className="px-4 py-2 text-right flex gap-2 justify-end">
-                                <button
-                                  onClick={() => {
-                                    const row = document.activeElement.closest("tr");
-                                    const nameInput = row.children[0].querySelector("input").value;
-                                    const updatedPrices = {};
-                                    sizeLabels.forEach((size, idx) => {
-                                      const val = row.children[idx + 1].querySelector("input").value;
-                                      if (val) updatedPrices[size] = parseFloat(val);
-                                    });
-                                    updateItem(section._id, item._id, nameInput, updatedPrices);
-                                  }}
-                                  className="text-green-600 hover:text-green-800"
-                                >
-                                  <Check size={16} />
-                                </button>
-                                <button
-                                  onClick={() => setEditingItem(null)}
-                                  className="text-gray-600 hover:text-gray-800"
-                                >
-                                  <X size={16} />
-                                </button>
-                              </td>
-                            </>
-                          ) : (
-                            <>
-                              <td className="px-4 py-2">{item.itemname}</td>
-                              {sizeLabels.map(size => (
-                                <td key={size} className="px-4 py-2">
-                                  {item.price[size] !== undefined ? `₹${item.price[size]}` : "-"}
-                                </td>
-                              ))}
-                              <td className="px-4 py-2 text-right">
-                                <div className="flex justify-end gap-2">
-                                  {/* <button onClick={() => setEditingItem(item._id)} className="text-blue-600 hover:text-blue-800">
-                                    <Edit3 size={16} />
-                                  </button> */}
-                                  <button onClick={() => deleteItem(section.sectionname, item.itemname)} className="text-red-600 hover:text-red-800">
-                                    <Trash2 size={16} />
-                                  </button>
-                                </div>
-                              </td>
-                            </>
-                          )}
-                        </tr>
+            <div className="p-4">
+              {section.menuitems.map((item) => (
+                <div key={item._id} className="mb-3 border-b pb-2">
+                  {editingItem === item._id ? (
+                    <div className="flex gap-2 flex-wrap">
+                      <input
+                        type="text"
+                        defaultValue={item.itemname}
+                        className="px-2 py-1 border rounded text-sm"
+                        id={`name-${item._id}`}
+                      />
+                      {Object.entries(item.price).map(([label, val]) => (
+                        <input
+                          key={label}
+                          defaultValue={val}
+                          placeholder={label}
+                          className="w-24 px-2 py-1 border rounded text-sm capitalize"
+                          id={`price-${item._id}-${label}`}
+                        />
                       ))}
-                    </tbody>
-                  </table>
-                );
-              })()}
+                      <button
+                        onClick={() => {
+                          const name = document.getElementById(`name-${item._id}`).value;
+                          const updated = {};
+                          Object.keys(item.price).forEach((label) => {
+                            const val = document.getElementById(`price-${item._id}-${label}`).value;
+                            updated[label] = parseFloat(val);
+                          });
+                          updateItem(section._id, item._id, name, updated);
+                        }}
+                        className="text-green-600"
+                      >
+                        <Check size={16} />
+                      </button>
+                      <button onClick={() => setEditingItem(null)} className="text-gray-600">
+                        <X size={16} />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex justify-between items-start flex-wrap gap-2">
+                      <div>
+                        <div className="font-medium text-gray-800">{item.itemname}</div>
+                        <div className="text-sm text-gray-600">
+                          {Object.entries(item.price).map(([size, value]) => (
+                            <span key={size} className="mr-3">
+                              <span className="capitalize">{size}</span>: ₹{value}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button onClick={() => setEditingItem(item._id)} className="text-blue-600">
+                          <Edit3 size={16} />
+                        </button>
+                        <button onClick={() => deleteItem(section._id, item._id)} className="text-red-600">
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
 
-              <div className="mt-4 pt-4 border-t border-gray-100">
-                <div className="grid grid-cols-12 gap-2 items-center">
+              {/* Add new item */}
+              <div className="mt-4 pt-4 border-t">
+                <div className="flex gap-2 flex-wrap mb-2">
                   <input
                     type="text"
                     placeholder="Item name"
                     value={newItemName}
                     onChange={(e) => setNewItemName(e.target.value)}
-                    className="col-span-4 px-3 py-2 border border-gray-300 rounded-md text-sm"
+                    className="px-3 py-2 border rounded-md text-sm"
                   />
-                  {["small", "medium", "large"].map((size) => (
-                    <input
-                      key={size}
-                      type="number"
-                      placeholder={size}
-                      value={newPrices[size]}
-                      onChange={(e) =>
-                        setNewPrices({ ...newPrices, [size]: e.target.value })
-                      }
-                      className="col-span-2 px-3 py-2 border border-gray-300 rounded-md text-sm capitalize"
-                    />
+                  {priceInputs.map((input, idx) => (
+                    <div key={idx} className="flex gap-1">
+                      <input
+                        type="text"
+                        placeholder="Size"
+                        value={input.key}
+                        onChange={(e) => {
+                          const updated = [...priceInputs];
+                          updated[idx].key = e.target.value;
+                          setPriceInputs(updated);
+                        }}
+                        className="w-20 px-2 py-1 border rounded text-sm"
+                      />
+                      <input
+                        type="number"
+                        placeholder="Price"
+                        value={input.value}
+                        onChange={(e) => {
+                          const updated = [...priceInputs];
+                          updated[idx].value = e.target.value;
+                          setPriceInputs(updated);
+                        }}
+                        className="w-24 px-2 py-1 border rounded text-sm"
+                      />
+                    </div>
                   ))}
                   <button
-                    onClick={() => addItem(section._id)}
-                    className="col-span-2 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
+                    onClick={() => setPriceInputs([...priceInputs, { key: "", value: "" }])}
+                    className="text-blue-600 hover:text-blue-800"
+                  >
+                    + Size
+                  </button>
+                  <button
+                    onClick={() => addItem(section.sectionname, newItemName, Object.fromEntries(priceInputs.map(input => [input.key, parseFloat(input.value)])))}
+                    className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
                   >
                     <Plus size={16} />
                   </button>
