@@ -182,19 +182,16 @@ return (
               ?.menuitems.map((item) => (
                 <div
                   key={item._id}
-                  className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 p-6 border border-orange-100"
+                  className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 p-2 border border-orange-100"
                 >
-                  <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
-                      <h3 className="text-xl font-bold text-gray-800 mb-2">
+                      <h3 className="text-xl font-bold text-gray-800">
                         {item.itemname}
                       </h3>
-                      <p className="text-gray-600 text-sm leading-relaxed">
+                      {/* <p className="text-gray-600 text-sm leading-relaxed">
                         {item.description || "Delicious and freshly prepared"}
-                      </p>
-                      <div className="flex items-center mt-2 text-xs text-orange-600">
-                        <Star size={12} className="fill-current mr-1" />
-                      </div>
+                      </p> */}
                     </div>
                   </div>
 
@@ -210,10 +207,10 @@ return (
                         return (
                           <div
                             key={size}
-                            className="flex items-center justify-between bg-white rounded-lg px-4 py-3 shadow-sm hover:shadow-md transition-shadow duration-200"
+                            className="flex items-center justify-between bg-white rounded-lg px-4 py-2 shadow-sm hover:shadow-md transition-shadow duration-200"
                           >
                             <div className="flex items-center space-x-3">
-                              <span className="bg-gradient-to-r from-orange-400 to-yellow-400 text-white px-3 py-1 rounded-full text-sm font-bold">
+                              <span className="bg-gradient-to-r from-orange-400 to-yellow-400 text-white px-2 rounded-full text-sm font-bold">
                                 {size.toUpperCase()}
                               </span>
                               <span className="text-lg font-bold text-gray-800">₹{price}</span>
@@ -224,7 +221,7 @@ return (
                                 <div className="flex items-center space-x-3 bg-orange-100 rounded-full px-2 py-1">
                                   <button
                                     onClick={() => removeFromCart(item._id, size)}
-                                    className="bg-white hover:bg-orange-200 text-orange-600 w-8 h-8 flex items-center justify-center rounded-full transition-colors duration-200 shadow-sm"
+                                    className="bg-white hover:bg-orange-200 text-orange-600 w-6 h-6 flex items-center justify-center rounded-full transition-colors duration-200 shadow-sm"
                                   >
                                     <Minus size={16} />
                                   </button>
@@ -233,7 +230,7 @@ return (
                                   </span>
                                   <button
                                     onClick={() => addToCart(item, size)}
-                                    className="bg-orange-500 hover:bg-orange-600 text-white w-8 h-8 flex items-center justify-center rounded-full transition-colors duration-200 shadow-sm"
+                                    className="bg-orange-500 hover:bg-orange-600 text-white w-6 h-6 flex items-center justify-center rounded-full transition-colors duration-200 shadow-sm"
                                   >
                                     <Plus size={16} />
                                   </button>
@@ -241,9 +238,9 @@ return (
                               ) : (
                                 <button
                                   onClick={() => addToCart(item, size)}
-                                  className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white font-bold px-6 py-2 rounded-full transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
+                                  className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white font-bold px-2 py-0.5 rounded-full transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
                                 >
-                                  Add to Cart
+                                  Add
                                 </button>
                               )}
                             </div>
