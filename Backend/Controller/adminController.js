@@ -49,7 +49,7 @@ const adminSignup = async (req, res) => {
             return res.status(400).json({ message: 'Admin already exists' });
         }
 
-        const admin = new Admin({ name, email, password, phone, restaurantName });
+        const admin = new Admin({ name, email, password : await bcrypt.hash(password), phone, restaurantName });
         await admin.save();
 
         res.status(201).json({ message: 'Admin registered successfully' });
