@@ -1,4 +1,14 @@
 const Admin = require('../Database/Models/adminSchema');
+const bcrypt = require('bcryptjs');
+const comparePassword = async (password,hashedPassword)=>{
+    try {
+        return await bcrypt.compare(password, hashedPassword);
+    } catch (error) {
+        console.error("Error comparing password:", error);
+        throw error;
+        
+    }
+}
 
 const adminLogin = async (req, res) => {
     const { email, password } = req.body;
@@ -9,7 +19,7 @@ const adminLogin = async (req, res) => {
             return res.status(404).json({ message: 'Admin not found' });
         }
 
-        const isMatch = await admin.comparePassword(password);
+        const isMatch = await comparePassword(password,Admin.password);
         if (!isMatch) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
