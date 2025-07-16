@@ -6,11 +6,12 @@ import {
 } from "lucide-react";
 import "./App.css";
 import axios from "axios";
+import {Toaster, toast } from 'react-hot-toast';
 
 const baseURL = import.meta.env.VITE_BASE_URL;
 
 function App() {
-  const [cart, setCart] = useState({});
+  const [cart, setCart] = useState([]);
   const [menuData, setMenuData] = useState([]);
   const [activeCategory, setActiveCategory] = useState(null);
   const [showCart, setShowCart] = useState(false);
@@ -30,42 +31,79 @@ function App() {
     fetchMenu();
   }, []);
 
-  const addToCart = (item, size) => {
-    const key = `${item._id}_${size}`;
-    setCart((prev) => ({
-      ...prev,
-      [key]: (prev[key] || 0) + 1,
-    }));
-  };
+  console.log(cart);
 
-  const removeFromCart = (key) => {
-    setCart((prev) => {
-      const newCart = { ...prev };
-      if (newCart[key] > 1) {
-        newCart[key]--;
+
+const addToCart = (item, size) => {
+  console.log("Adding to cart:", item.itemname, size);
+  setCart((prevCart) => {
+    const index = prevCart.findIndex(
+      (entry) => entry.itemId === item._id && entry.size === size
+    );
+    if (index !== -1) {
+      const updated = [...prevCart];
+      updated[index].quantity += 1;
+      return updated;
+    } else {
+      return [...prevCart, { itemId: item._id, size, quantity: 1 }];
+    }
+  });
+};
+
+
+  const removeFromCart = (itemId, size) => {
+  setCart((prevCart) => {
+    const index = prevCart.findIndex(
+      (entry) => entry.itemId === itemId && entry.size === size
+    );
+    if (index !== -1) {
+      const updated = [...prevCart];
+      if (updated[index].quantity > 1) {
+        updated[index].quantity -= 1;
       } else {
-        delete newCart[key];
+        updated.splice(index, 1);
       }
-      return newCart;
-    });
-  };
+      return updated;
+    }
+    return prevCart;
+  });
+};
 
   const getCartTotal = () => {
-    let total = 0;
-    Object.entries(cart).forEach(([key, quantity]) => {
-      const [itemId, size] = key.split("_");
-      const item = menuData.flatMap((section) => section.menuitems).find((item) => item._id === itemId);
-      if (item && item.price[size]) {
-        total += item.price[size] * quantity;
-      }
-    });
+  return cart.reduce((total, entry) => {
+    const item = menuData
+      .flatMap((section) => section.menuitems)
+      .find((i) => i._id === entry.itemId);
+    if (item && item.price[entry.size]) {
+      return total + item.price[entry.size] * entry.quantity;
+    }
     return total;
-  };
+  }, 0);
+};
 
-  const getCartItemCount = () => {
-    return Object.values(cart).reduce((sum, count) => sum + count, 0);
-  };
 
+
+
+  const createOrder = async()=>{
+    console.log("click");
+    const tableNumber = 5;
+    try{
+        const response = await axios.post(`${baseURL}/orders/create-order`, {items: cart, totalAmount: getCartTotal(), tableNumber});
+        console.log(response);
+        if(response.status===201){
+          toast.success("Order Placed Succefully");
+          setCart([]);
+          setShowCart(false)
+        }
+    }
+    catch(error){
+      toast.error(error);
+    }
+  }
+
+const getCartItemCount = () => {
+  return cart.reduce((total, entry) => total + entry.quantity, 0);
+};
   const categories = menuData.map((section) => ({
     id: section._id,
     name: section.sectionname,
@@ -73,6 +111,7 @@ function App() {
 
   return (
     <div className="bg-slate-50">
+      <Toaster />
       <div className="bg-yellow-400 shadow-sm sticky top-0 z-40 w-full">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <div>
@@ -124,16 +163,47 @@ function App() {
                 </div>
 
                 {item.price && typeof item.price === 'object' ? (
-                  <div className="flex items-end justify-end gap-2">
-                    {Object.entries(item.price).map(([size, price]) => (
-                      <button
-                        key={size}
-                        onClick={() => addToCart(item, size)}
-                        className="bg-yellow-300 px-2 py-1 rounded-md text-sm font-semibold text-slate-800 hover:bg-yellow-400"
-                      >
-                        {size.toUpperCase()} - ₹{price}
-                      </button>
-                    ))}
+                  <div className="flex items border justify-end gap-2">
+                    {Object.entries(item.price).map(([size, price]) => {
+  const cartEntry = cart.find(
+    (entry) => entry.itemId === item._id && entry.size === size
+  );
+  const quantity = cartEntry ? cartEntry.quantity : 0;
+
+  return (
+    <div key={size} className="flex items-center gap-2 bg-slate-100 rounded-md px-2 py-1">
+      <span className="text-sm font-semibold text-slate-800">
+        {size.toUpperCase()} - ₹{price}
+      </span>
+
+      {quantity > 0 ? (
+        <div className="flex items-center">
+          <button
+            onClick={() => removeFromCart(item._id, size)}
+            className="bg-yellow-300 hover:bg-yellow-400 text-slate-800 p-0.5 rounded"
+          >
+            <Minus size={14} />
+          </button>
+          <span className="text-sm font-semibold w-6 text-center">{quantity}</span>
+          <button
+            onClick={() => addToCart(item, size)}
+            className="bg-yellow-300 hover:bg-yellow-400 text-slate-800 p-0.5 rounded"
+          >
+            <Plus size={14} />
+          </button>
+        </div>
+      ) : (
+        <button
+          onClick={() => addToCart(item, size)}
+          className="ml-auto bg-yellow-300 hover:bg-yellow-400 text-sm font-semibold text-slate-800 px-1 rounded"
+        >
+          Add
+        </button>
+      )}
+    </div>
+  );
+})}
+
                   </div>
                 ) : (
                   <button
@@ -149,77 +219,89 @@ function App() {
         </div>
       </div>
 
-      {showCart && getCartItemCount() > 0 && (
-        <div className="fixed inset-0 bg-transparent backdrop-blur-sm bg-opacity-50 z-50 flex items-center">
-          <div className="bg-white w-full max-w-md mx-auto rounded-2xl p-6 max-h-[70vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-slate-800">Your Order</h2>
-              <button
-                onClick={() => setShowCart(false)}
-                className="text-slate-500 hover:text-slate-700"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="space-y-3 mb-6">
-              {Object.entries(cart).map(([key, quantity]) => {
-                const [itemId, size] = key.split("_");
-                const item = menuData.flatMap((section) => section.menuitems).find((i) => i._id === itemId);
-                if (!item) return null;
-                return (
-                  <div key={key} className="flex justify-between items-center">
-                    <div>
-                      <h4 className="font-medium text-slate-800">{item.itemname} ({size.toUpperCase()})</h4>
-                      <p className="text-sm text-slate-600">₹{item.price[size]} each</p>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => removeFromCart(key)}
-                        className="w-6 h-6 bg-slate-100 rounded-full flex items-center justify-center"
-                      >
-                        <Minus size={14} />
-                      </button>
-                      <span>{quantity}</span>
-                      <button
-                        onClick={() => addToCart(item, size)}
-                        className="w-6 h-6 bg-slate-800 text-white rounded-full flex items-center justify-center"
-                      >
-                        <Plus size={14} />
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-            <div className="border-t pt-4">
-              <div className="flex justify-between items-center mb-4">
-                <span className="text-lg font-bold">Total</span>
-                <span className="text-2xl font-bold">₹{getCartTotal()}</span>
+      {showCart && cart.length > 0 && (
+  <div className="fixed inset-0 bg-transparent backdrop-blur-sm bg-opacity-50 z-50 flex items-center">
+    <div className="bg-white w-full max-w-md mx-auto rounded-2xl p-6 max-h-[70vh] overflow-y-auto">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-bold text-slate-800">Your Order</h2>
+        <button
+          onClick={() => setShowCart(false)}
+          className="text-slate-500 hover:text-slate-700"
+        >
+          ✕
+        </button>
+      </div>
+
+      {/* Cart Items */}
+      <div className="space-y-3 mb-6">
+        {cart.map((entry, index) => {
+          const { itemId, size, quantity } = entry;
+          const item = menuData
+            .flatMap((section) => section.menuitems)
+            .find((i) => i._id === itemId);
+          if (!item) return null;
+          return (
+            <div key={itemId + size} className="flex justify-between items-center">
+              <div>
+                <h4 className="font-medium text-slate-800">
+                  {item.itemname} ({size.toUpperCase()})
+                </h4>
+                <p className="text-sm text-slate-600">₹{item.price[size]} each</p>
               </div>
-              <button className="w-full bg-slate-800 text-white py-4 rounded-xl font-medium hover:bg-slate-700">
-                Place Order
-              </button>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => removeFromCart(itemId, size)}
+                  className="w-6 h-6 bg-slate-100 rounded-full flex items-center justify-center"
+                >
+                  <Minus size={14} />
+                </button>
+                <span>{quantity}</span>
+                <button
+                  onClick={() => addToCart(item, size)}
+                  className="w-6 h-6 bg-slate-800 text-white rounded-full flex items-center justify-center"
+                >
+                  <Plus size={14} />
+                </button>
+              </div>
             </div>
-          </div>
+          );
+        })}
+      </div>
+
+      {/* Cart Total */}
+      <div className="border-t pt-4">
+        <div className="flex justify-between items-center mb-4">
+          <span className="text-lg font-bold">Total</span>
+          <span className="text-2xl font-bold">₹{getCartTotal()}</span>
         </div>
-      )}
+
+        <button className="w-full bg-slate-800 text-white py-4 rounded-xl font-medium hover:bg-slate-700"
+          onClick={createOrder}
+        >
+          Place Order
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
       {!showCart &&
-        (getCartItemCount() > 0 ? (
-          <button
-            onClick={() => setShowCart(true)}
-            className="fixed bottom-6 right-6 bg-slate-800 text-white p-4 rounded-full shadow-lg hover:bg-slate-700"
-          >
-            <div className="flex items-center space-x-2">
-              <ShoppingCart size={20} />
-              <span>₹{getCartTotal()}</span>
-            </div>
-          </button>
-        ) : (
-          <div className="fixed bottom-6 right-6 bg-red-600 border text-yellow-400 text-sm px-4 py-2 rounded-lg shadow">
-            Add food first 🍔
-          </div>
-        ))}
+  (getCartItemCount() > 0 ? (
+    <button
+      onClick={() => setShowCart(true)}
+      className="fixed bottom-6 right-6 bg-slate-800 text-white p-4 rounded-full shadow-lg hover:bg-slate-700"
+    >
+      <div className="flex items-center space-x-2">
+        <ShoppingCart size={20} />
+        <span>₹{getCartTotal()}</span>
+      </div>
+    </button>
+  ) : (
+    <div className="fixed bottom-6 right-6 bg-red-600 border text-yellow-400 text-sm px-4 py-2 rounded-lg shadow">
+      Add food first 🍔
+    </div>
+  ))}
+
     </div>
   );
 }

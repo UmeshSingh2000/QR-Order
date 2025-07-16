@@ -3,6 +3,7 @@ const Order = require('../Database/Models/orderSchema');
 const createOrder = async (req, res) => {
     try {
         const { tableNumber, items, totalAmount } = req.body;
+        console.log(req.body);
 
         if (!items || !Array.isArray(items) || items.length === 0) {
             return res.status(400).json({ message: 'Order must include at least one item' });
@@ -11,7 +12,7 @@ const createOrder = async (req, res) => {
         const newOrder = new Order({ tableNumber, items, totalAmount });
         const savedOrder = await newOrder.save();
 
-        res.status(201).json(savedOrder);
+        res.status(201).json({savedOrder});
     } catch (error) {
         console.error('Error creating order:', error);
         res.status(500).json({ message: 'Internal Server Error' });
