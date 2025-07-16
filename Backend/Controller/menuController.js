@@ -40,66 +40,66 @@ const addMenuItem = async (req, res) => {
 };
 
 const addMultipleMenuItems = async (req, res) => {
-  const items = req.body;
+    const items = req.body;
 
-  if (!Array.isArray(items) || items.length === 0) {
-    return res.status(400).json({ message: 'Request body must be a non-empty array' });
-  }
-
-  try {
-    const groupedBySection = {};
-
-    // Step 1: Group items by sectionname
-    for (const item of items) {
-      const { sectionname, itemname, price } = item;
-      if (!sectionname || !itemname || !price) continue;
-
-      const key = sectionname.toLowerCase();
-      if (!groupedBySection[key]) {
-        groupedBySection[key] = {
-          originalName: sectionname,
-          items: []
-        };
-      }
-
-      groupedBySection[key].items.push({ itemname, price });
+    if (!Array.isArray(items) || items.length === 0) {
+        return res.status(400).json({ message: 'Request body must be a non-empty array' });
     }
 
-    // Step 2: Process each section
-    for (const key in groupedBySection) {
-      const { originalName, items } = groupedBySection[key];
+    try {
+        const groupedBySection = {};
 
-      let section = await Menu.findOne({ sectionname: originalName });
+        // Step 1: Group items by sectionname
+        for (const item of items) {
+            const { sectionname, itemname, price } = item;
+            if (!sectionname || !itemname || !price) continue;
 
-      if (section) {
-        // Add only non-duplicate items
-        for (const newItem of items) {
-          const exists = section.menuitems.some(
-            i => i.itemname.toLowerCase() === newItem.itemname.toLowerCase()
-          );
-          if (!exists) {
-            section.menuitems.push(newItem);
-          }
+            const key = sectionname.toLowerCase();
+            if (!groupedBySection[key]) {
+                groupedBySection[key] = {
+                    originalName: sectionname,
+                    items: []
+                };
+            }
+
+            groupedBySection[key].items.push({ itemname, price });
         }
-        await section.save();
-      } else {
-        // Create new section
-        const newSection = new Menu({
-          sectionname: originalName,
-          menuitems: items
-        });
-        await newSection.save();
-      }
-    }
 
-    res.status(200).json({ message: 'Menu items added successfully' });
-  } catch (error) {
-    console.error('Error adding multiple menu items:', error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
+        // Step 2: Process each section
+        for (const key in groupedBySection) {
+            const { originalName, items } = groupedBySection[key];
+
+            let section = await Menu.findOne({ sectionname: originalName });
+
+            if (section) {
+                // Add only non-duplicate items
+                for (const newItem of items) {
+                    const exists = section.menuitems.some(
+                        i => i.itemname.toLowerCase() === newItem.itemname.toLowerCase()
+                    );
+                    if (!exists) {
+                        section.menuitems.push(newItem);
+                    }
+                }
+                await section.save();
+            } else {
+                // Create new section
+                const newSection = new Menu({
+                    sectionname: originalName,
+                    menuitems: items
+                });
+                await newSection.save();
+            }
+        }
+
+        res.status(200).json({ message: 'Menu items added successfully' });
+    } catch (error) {
+        console.error('Error adding multiple menu items:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
 };
 
-const deleteMenuItem = async (req,res)=>{
+const deleteMenuItem = async (req, res) => {
     const { sectionname, itemname } = req.body;
 
     if (!sectionname || !itemname) {
@@ -129,8 +129,23 @@ const deleteMenuItem = async (req,res)=>{
     }
 }
 
+const getMenuItem = async (req, res) => {
+    try {
+        const menu = await Menu.find();
+        if (!menu || menu.length === 0) {
+            return res.status(404).json({ message: 'No menu items found' });
+        }
+        res.status(200).json(menu);
+    } catch (error) {
+        console.error('Error fetching menu item:', error);
+        res.status(500).json({ message: 'Server error' });
+
+    }
+}
+
 module.exports = {
     addMenuItem,
     addMultipleMenuItems,
-    deleteMenuItem
+    deleteMenuItem,
+    getMenuItem
 };
