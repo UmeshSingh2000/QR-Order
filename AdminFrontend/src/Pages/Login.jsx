@@ -25,7 +25,7 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
 
-   const response = await axios.post(`${baseurl}/admin/login`, formData);
+   const response = await axios.post(`${baseurl}/api/admin/login`, formData);
     if (response.data.success) {
       navigate('/admin/orders');
     } else {
