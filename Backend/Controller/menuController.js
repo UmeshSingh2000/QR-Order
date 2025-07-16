@@ -223,5 +223,6 @@ module.exports = {
     addMultipleMenuItems,
     deleteMenuItem,
     getMenuItem,
-    deleteSection
+    deleteSection,
+    createSection
 };
