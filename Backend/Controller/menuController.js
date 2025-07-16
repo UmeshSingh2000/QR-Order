@@ -162,7 +162,7 @@ const deleteMenuItem = async (req, res) => {
 }
 const deleteSection = async (req,res)=>{
     try {
-        const { sectionname } = req.body;
+        const { sectionname } = req.params;
 
         if (!sectionname) {
             return res.status(400).json({ message: 'sectionname is required' });
