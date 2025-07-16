@@ -1,129 +1,50 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Plus,
   Minus,
   ShoppingCart,
-  Star,
-  Clock,
-  Flame,
-  Leaf,
 } from "lucide-react";
 import "./App.css";
+import axios from "axios";
+
+const baseURL = import.meta.env.VITE_BASE_URL;
 
 function App() {
   const [cart, setCart] = useState({});
-  const [activeCategory, setActiveCategory] = useState("combos");
+  const [menuData, setMenuData] = useState([]);
+  const [activeCategory, setActiveCategory] = useState(null);
   const [showCart, setShowCart] = useState(false);
+  const [selectedSizes, setSelectedSizes] = useState({});
 
-  const categories = [
-    { id: "combos", name: "Combos", icon: "👑" },
-    { id: "whopperDeluxe", name: "Whopper Deluxe", icon: "👑" },
-    { id: "monsoonMania", name: "Monsoon Mania", icon: "🌧" },
-    { id: "premiumBurgers", name: "New Premium Burgers", icon: "🍔" },
-    { id: "koreanSpicy", name: "Korean Spicy Fest", icon: "🌶️" },
-    { id: "originalWhopper", name: "Original Whopper", icon: "🍟" },
-  ];
+  useEffect(() => {
+    const fetchMenu = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/menu/getMenuItem`);
+        setMenuData(response.data);
+        setActiveCategory(response.data[0]?._id);
+      } catch (error) {
+        console.error("Error fetching menu:", error);
+      }
+    };
 
-  const menuData = {
-    combos: [
-      {
-        id: 1,
-        name: "BK Veggie Burger Meal",
-        description: "2 Veggie Burgers + Fries + Cookie Crunch Sundae + Coke",
-        price: 1035,
-        spicy: false,
-        vegetarian: true,
-        time: "15 min",
-        rating: 4.7,
-      },
-      {
-        id: 2,
-        name: "BK Chicken Burger Meal",
-        description: "2 Chicken Burgers + Fries + Cookie Crunch Sundae + Coke",
-        price: 1075,
-        spicy: true,
-        vegetarian: false,
-        time: "18 min",
-        rating: 4.8,
-      },
-    ],
-    whopperDeluxe: [
-      {
-        id: 3,
-        name: "Deluxe Veg Whopper",
-        description: "Jumbo Veg Whopper with cheese, fries & coke",
-        price: 1195,
-        spicy: false,
-        vegetarian: true,
-        time: "20 min",
-        rating: 4.6,
-      },
-    ],
-    monsoonMania: [
-      {
-        id: 4,
-        name: "Spicy Chicken Storm",
-        description: "Spicy Chicken Whopper + Fries + Dessert",
-        price: 1125,
-        spicy: true,
-        vegetarian: false,
-        time: "15 min",
-        rating: 4.4,
-      },
-    ],
-    premiumBurgers: [
-      {
-        id: 5,
-        name: "Crispy Paneer Royale",
-        description: "Crispy fried paneer patty with sauces and cheese",
-        price: 935,
-        spicy: false,
-        vegetarian: true,
-        time: "12 min",
-        rating: 4.9,
-      },
-    ],
-    koreanSpicy: [
-      {
-        id: 6,
-        name: "Korean Fiery Chicken",
-        description: "Korean spicy grilled chicken with smoky mayo",
-        price: 1025,
-        spicy: true,
-        vegetarian: false,
-        time: "17 min",
-        rating: 4.5,
-      },
-    ],
-    originalWhopper: [
-      {
-        id: 7,
-        name: "Original Chicken Whopper",
-        description:
-          "Classic flame-grilled chicken whopper with lettuce & sauce",
-        price: 935,
-        spicy: false,
-        vegetarian: false,
-        time: "14 min",
-        rating: 4.3,
-      },
-    ],
-  };
+    fetchMenu();
+  }, []);
 
-  const addToCart = (item) => {
+  const addToCart = (item, size) => {
+    const key = `${item._id}_${size}`;
     setCart((prev) => ({
       ...prev,
-      [item.id]: (prev[item.id] || 0) + 1,
+      [key]: (prev[key] || 0) + 1,
     }));
   };
 
-  const removeFromCart = (itemId) => {
+  const removeFromCart = (key) => {
     setCart((prev) => {
       const newCart = { ...prev };
-      if (newCart[itemId] > 1) {
-        newCart[itemId]--;
+      if (newCart[key] > 1) {
+        newCart[key]--;
       } else {
-        delete newCart[itemId];
+        delete newCart[key];
       }
       return newCart;
     });
@@ -131,11 +52,12 @@ function App() {
 
   const getCartTotal = () => {
     let total = 0;
-    Object.entries(cart).forEach(([itemId, quantity]) => {
-      const item = Object.values(menuData)
-        .flat()
-        .find((item) => item.id === parseInt(itemId));
-      if (item) total += item.price * quantity;
+    Object.entries(cart).forEach(([key, quantity]) => {
+      const [itemId, size] = key.split("_");
+      const item = menuData.flatMap((section) => section.menuitems).find((item) => item._id === itemId);
+      if (item && item.price[size]) {
+        total += item.price[size] * quantity;
+      }
     });
     return total;
   };
@@ -144,21 +66,22 @@ function App() {
     return Object.values(cart).reduce((sum, count) => sum + count, 0);
   };
 
+  const categories = menuData.map((section) => ({
+    id: section._id,
+    name: section.sectionname,
+  }));
+
   return (
     <div className="bg-slate-50">
-      {/* Navbar - Full Width */}
       <div className="bg-yellow-400 shadow-sm sticky top-0 z-40 w-full">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-slate-800">Burger House</h1>
-            <p className="text-sm font-bold text-[#6b240c] drop-shadow-sm flex items-center space-x-1">
-              <span>🍽️</span>
-              <span>Table #12</span>
-            </p>
+            <p className="text-sm font-bold text-[#6b240c] flex items-center">🍽️ Table #12</p>
           </div>
           <button
             onClick={() => setShowCart(!showCart)}
-            className="relative bg-slate-800 text-white p-3 rounded-full hover:bg-slate-700 transition-colors"
+            className="relative bg-slate-800 text-white p-3 rounded-full hover:bg-slate-700"
           >
             <ShoppingCart size={20} />
             {getCartItemCount() > 0 && (
@@ -170,9 +93,7 @@ function App() {
         </div>
       </div>
 
-      {/* Main Section */}
       <div className="flex">
-        {/* Sidebar */}
         <div className="w-[25%] bg-slate-50 shadow-md py-4 h-[calc(100vh-80px)] sticky top-20">
           <div className="flex flex-col space-y-2 px-2">
             {categories.map((category) => (
@@ -185,51 +106,49 @@ function App() {
                     : "text-slate-700 hover:bg-slate-200"
                 }`}
               >
-                {category.icon} {category.name}
+                {category.name}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Menu Items */}
         <div className="flex-1 w-[75%]">
           <div className="max-w-4xl mx-auto px-4 py-6 space-y-4">
-            {menuData[activeCategory]?.map((item) => (
+            {menuData.find((section) => section._id === activeCategory)?.menuitems.map((item) => (
               <div
-                key={item.id}
-                className="bg-white rounded-xl shadow-sm p-4 flex items-center space-x-4"
+                key={item._id}
+                className="bg-white rounded-xl shadow-sm p-4 flex flex-col gap-4"
               >
-                {/* Item Details */}
-                <div className="flex-1">
-                  <div className="flex items-start justify-between">
-                    <h3 className="text-lg font-bold text-brown-800">
-                      {item.name}
-                    </h3>
-                    {/* {item.vegetarian ? (
-        <img src="/veg-icon.png" alt="Veg" className="w-4 h-4 mt-1" />
-      ) : (
-        <img src="/nonveg-icon.png" alt="Non-Veg" className="w-4 h-4 mt-1" />
-      )} */}
-                  </div>
-                  <div className="flex items-center justify-between mt-3">
-                    <span className="text-lg font-semibold text-brown-900">
-                      ₹{item.price}/-
-                    </span>
-                    <button
-                      onClick={() => addToCart(item)}
-                      className="bg-yellow-300 hover:bg-yellow-400 text-black text-sm font-semibold py-1 px-4 rounded-full"
-                    >
-                      Add +
-                    </button>
-                  </div>
+                <div className="flex justify-between">
+                  <h3 className="text-lg font-bold text-brown-800">{item.itemname}</h3>
                 </div>
+
+                {item.price && typeof item.price === 'object' ? (
+                  <div className="flex items-end justify-end gap-2">
+                    {Object.entries(item.price).map(([size, price]) => (
+                      <button
+                        key={size}
+                        onClick={() => addToCart(item, size)}
+                        className="bg-yellow-300 px-2 py-1 rounded-md text-sm font-semibold text-slate-800 hover:bg-yellow-400"
+                      >
+                        {size.toUpperCase()} - ₹{price}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => addToCart(item, "default")}
+                    className="bg-yellow-300 hover:bg-yellow-400 text-black text-sm font-semibold py-1 px-4 rounded-full"
+                  >
+                    Add + ₹{item.price}
+                  </button>
+                )}
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* Cart Modal */}
       {showCart && getCartItemCount() > 0 && (
         <div className="fixed inset-0 bg-transparent backdrop-blur-sm bg-opacity-50 z-50 flex items-center">
           <div className="bg-white w-full max-w-md mx-auto rounded-2xl p-6 max-h-[70vh] overflow-y-auto">
@@ -243,34 +162,26 @@ function App() {
               </button>
             </div>
             <div className="space-y-3 mb-6">
-              {Object.entries(cart).map(([itemId, quantity]) => {
-                const item = Object.values(menuData)
-                  .flat()
-                  .find((i) => i.id === parseInt(itemId));
+              {Object.entries(cart).map(([key, quantity]) => {
+                const [itemId, size] = key.split("_");
+                const item = menuData.flatMap((section) => section.menuitems).find((i) => i._id === itemId);
                 if (!item) return null;
                 return (
-                  <div
-                    key={itemId}
-                    className="flex justify-between items-center"
-                  >
+                  <div key={key} className="flex justify-between items-center">
                     <div>
-                      <h4 className="font-medium text-slate-800">
-                        {item.name}
-                      </h4>
-                      <p className="text-sm text-slate-600">
-                        ₹{item.price} each
-                      </p>
+                      <h4 className="font-medium text-slate-800">{item.itemname} ({size.toUpperCase()})</h4>
+                      <p className="text-sm text-slate-600">₹{item.price[size]} each</p>
                     </div>
                     <div className="flex items-center space-x-2">
                       <button
-                        onClick={() => removeFromCart(item.id)}
+                        onClick={() => removeFromCart(key)}
                         className="w-6 h-6 bg-slate-100 rounded-full flex items-center justify-center"
                       >
                         <Minus size={14} />
                       </button>
                       <span>{quantity}</span>
                       <button
-                        onClick={() => addToCart(item)}
+                        onClick={() => addToCart(item, size)}
                         className="w-6 h-6 bg-slate-800 text-white rounded-full flex items-center justify-center"
                       >
                         <Plus size={14} />
@@ -293,7 +204,6 @@ function App() {
         </div>
       )}
 
-      {/* Floating Cart Button */}
       {!showCart &&
         (getCartItemCount() > 0 ? (
           <button

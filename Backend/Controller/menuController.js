@@ -1,7 +1,5 @@
 const Menu = require('../Database/Models/menuSchema');
 
-
-
 const addMenuItem = async (req, res) => {
   const { sectionname, itemname, price } = req.body;
 
