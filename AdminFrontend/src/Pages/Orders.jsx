@@ -10,51 +10,38 @@ const socket = io('http://localhost:3000');
 const Orders = () => {
   const navigate = useNavigate()
   useEffect(() => {
-    socket.on('orderReceive', (orderItems,table) => {
-      console.log('Order received:', orderItems);
-      console.log('Table:', table);
-    })
-    return () => {
-      socket.off('orderReceive');
+  socket.on('orderReceive', (orderItems, tableNumber) => {
+    const formattedItems = orderItems.map((item, index) => ({
+      id: Date.now() + index, // unique id for each item
+      name: item.itemname,
+      price: parseFloat(item.price),
+      quantity: parseInt(item.quantity),
+      size: item.size
+    }));
+
+    const total = formattedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+    const newOrder = {
+      id: Date.now(),
+      // customerName: 'Walk-in Customer',
+      tableNumber: tableNumber,
+      items: formattedItems,
+     
+      timestamp: new Date(),
+      total
     };
-  }, [])
-  const [orders, setOrders] = useState([
-    {
-      id: 1,
-      customerName: "John Doe",
-      tableNumber: "Table 5",
-      items: [
-        { id: 1, name: "Caesar Salad", price: 12.99, quantity: 1 },
-        { id: 2, name: "Grilled Salmon", price: 24.99, quantity: 1 }
-      ],
-      status: "pending",
-      timestamp: new Date(Date.now() - 300000),
-      total: 37.98
-    },
-    {
-      id: 2,
-      customerName: "Jane Smith",
-      tableNumber: "Table 2",
-      items: [
-        { id: 3, name: "Chicken Parmesan", price: 19.99, quantity: 2 },
-        { id: 4, name: "Garlic Bread", price: 8.99, quantity: 1 }
-      ],
-      status: "preparing",
-      timestamp: new Date(Date.now() - 600000),
-      total: 48.97
-    },
-    {
-      id: 3,
-      customerName: "Mike Johnson",
-      tableNumber: "Table 8",
-      items: [
-        { id: 5, name: "Caesar Salad", price: 12.99, quantity: 1 }
-      ],
-      status: "ready",
-      timestamp: new Date(Date.now() - 900000),
-      total: 12.99
-    }
-  ])
+
+    setOrders(prev => [newOrder, ...prev]);
+    console.log('New Order received from table:', tableNumber);
+  });
+
+  return () => {
+    socket.off('orderReceive');
+  };
+}, []);
+
+  const [orders, setOrders] = useState([])
+   console.log('Order received:', orders);
 
   const [showNewOrder, setShowNewOrder] = useState(false)
   const [selectedOrder, setSelectedOrder] = useState(null)
@@ -286,22 +273,15 @@ const Orders = () => {
                   <div className="p-4">
                     <div className="flex justify-between items-start mb-3">
                       <div>
-                        <h3 className={`font-semibold ${isCompleted ? 'text-gray-500' : 'text-gray-800'}`}>
-                          {order.customerName}
-                        </h3>
+                        
                         <p className={`text-sm ${isCompleted ? 'text-gray-400' : 'text-gray-600'}`}>
-                          {order.tableNumber}
+                          Table Number: {order.tableNumber}
                         </p>
                         <p className={`text-xs ${isCompleted ? 'text-gray-400' : 'text-gray-500'}`}>
                           {formatTime(order.timestamp)}
                         </p>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium border flex items-center gap-1 ${isCompleted ? 'bg-gray-200 text-gray-600 border-gray-300' : statusColors[order.status]}`}>
-                          {statusIcons[order.status]}
-                          {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                        </span>
-                      </div>
+                      
                     </div>
 
                     <div className="space-y-1 mb-3">
