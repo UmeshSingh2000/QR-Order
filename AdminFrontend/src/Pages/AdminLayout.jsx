@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts'
-import { Users, ShoppingCart, DollarSign, TrendingUp, Bell, Search, Settings, Menu, X } from 'lucide-react'
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell
+} from 'recharts'
+import { Users, ShoppingCart, DollarSign, TrendingUp, Bell, Search, Settings, Menu as MenuIcon } from 'lucide-react'
 
 const AdminLayout = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-
-  // Dummy data
   const stats = [
     { id: 1, name: 'Total Users', value: '12,345', change: '+12%', icon: Users, color: 'bg-blue-500' },
     { id: 2, name: 'Total Orders', value: '8,721', change: '+5%', icon: ShoppingCart, color: 'bg-green-500' },
@@ -54,206 +54,137 @@ const AdminLayout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0`}>
-        <div className="flex items-center justify-between h-16 px-6 bg-blue-600">
-          <h1 className="text-xl font-bold text-white">Admin Panel</h1>
-          <button
-            onClick={() => setSidebarOpen(false)}
-            className="lg:hidden text-white hover:text-gray-200"
-          >
-            <X size={24} />
-          </button>
+    <div className="min-h-screen bg-gray-50 pb-20">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b">
+        <div className="flex items-center justify-between px-4 py-4">
+          <h2 className="text-xl font-semibold text-gray-900">Dashboard</h2>
+          <div className="flex items-center space-x-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+              <input
+                type="text"
+                placeholder="Search..."
+                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg relative">
+              <Bell size={20} />
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
+            </button>
+            <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+              <Settings size={20} />
+            </button>
+          </div>
         </div>
-        <nav className="mt-8">
-          <div className="px-6 py-3 text-sm font-medium text-gray-900 bg-blue-50 border-r-4 border-blue-600">
-            Dashboard
-          </div>
-          <div className="px-6 py-3 text-sm text-gray-600 hover:bg-gray-50 cursor-pointer">
-            Users
-          </div>
-          <div className="px-6 py-3 text-sm text-gray-600 hover:bg-gray-50 cursor-pointer">
-            Orders
-          </div>
-          <div className="px-6 py-3 text-sm text-gray-600 hover:bg-gray-50 cursor-pointer">
-            Products
-          </div>
-          <div className="px-6 py-3 text-sm text-gray-600 hover:bg-gray-50 cursor-pointer">
-            Analytics
-          </div>
-          <div className="px-6 py-3 text-sm text-gray-600 hover:bg-gray-50 cursor-pointer">
-            Settings
-          </div>
-        </nav>
-      </div>
+      </header>
 
       {/* Main Content */}
-      <div className="lg:ml-64">
-        {/* Header */}
-        <header className="bg-white shadow-sm border-b">
-          <div className="flex items-center justify-between px-6 py-4">
-            <div className="flex items-center">
-              <button
-                onClick={() => setSidebarOpen(true)}
-                className="lg:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100"
-              >
-                <Menu size={20} />
-              </button>
-              <h2 className="ml-2 text-2xl font-semibold text-gray-900">Dashboard</h2>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
+      <main className="p-4 space-y-6">
+        {/* Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {stats.map((stat) => (
+            <div key={stat.id} className="bg-white rounded-lg shadow p-4 flex justify-between items-center">
+              <div>
+                <p className="text-sm text-gray-600">{stat.name}</p>
+                <p className="text-xl font-bold text-gray-900">{stat.value}</p>
+                <p className="text-sm text-green-600">{stat.change}</p>
               </div>
-              <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg relative">
-                <Bell size={20} />
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
-              </button>
-              <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
-                <Settings size={20} />
-              </button>
-              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                <span className="text-white font-medium">A</span>
+              <div className={`p-3 rounded-full ${stat.color}`}>
+                <stat.icon className="text-white" size={24} />
               </div>
             </div>
-          </div>
-        </header>
+          ))}
+        </div>
 
-        {/* Main Dashboard Content */}
-        <main className="p-6">
-          {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {stats.map((stat) => (
-              <div key={stat.id} className="bg-white rounded-lg shadow p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600">{stat.name}</p>
-                    <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                    <p className="text-sm text-green-600">{stat.change}</p>
-                  </div>
-                  <div className={`p-3 rounded-full ${stat.color}`}>
-                    <stat.icon className="text-white" size={24} />
-                  </div>
-                </div>
-              </div>
-            ))}
+        {/* Charts */}
+        <div className="space-y-6">
+          <div className="bg-white rounded-lg shadow p-4">
+            <h3 className="text-md font-semibold mb-4">Monthly Growth</h3>
+            <ResponsiveContainer width="100%" height={250}>
+              <LineChart data={monthlyData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+                <Line type="monotone" dataKey="users" stroke="#8884d8" strokeWidth={2} />
+                <Line type="monotone" dataKey="orders" stroke="#82ca9d" strokeWidth={2} />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
 
-          {/* Charts Row */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            {/* Monthly Growth Chart */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-semibold mb-4">Monthly Growth</h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={monthlyData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip />
-                  <Line type="monotone" dataKey="users" stroke="#8884d8" strokeWidth={2} />
-                  <Line type="monotone" dataKey="orders" stroke="#82ca9d" strokeWidth={2} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-
-            {/* Device Usage Chart */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-semibold mb-4">Device Usage</h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={pieData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
-          {/* Tables Row */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Recent Orders */}
-            <div className="bg-white rounded-lg shadow">
-              <div className="p-6 border-b">
-                <h3 className="text-lg font-semibold">Recent Orders</h3>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {recentOrders.map((order) => (
-                      <tr key={order.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{order.id}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.customer}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{order.amount}</td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(order.status)}`}>
-                            {order.status}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            {/* Top Products */}
-            <div className="bg-white rounded-lg shadow">
-              <div className="p-6 border-b">
-                <h3 className="text-lg font-semibold">Top Products</h3>
-              </div>
-              <div className="p-6">
-                <div className="space-y-4">
-                  {topProducts.map((product, index) => (
-                    <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                      <div>
-                        <h4 className="font-medium text-gray-900">{product.name}</h4>
-                        <p className="text-sm text-gray-500">{product.sales} sales</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-semibold text-gray-900">{product.revenue}</p>
-                      </div>
-                    </div>
+          <div className="bg-white rounded-lg shadow p-4">
+            <h3 className="text-md font-semibold mb-4">Device Usage</h3>
+            <ResponsiveContainer width="100%" height={250}>
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  outerRadius={80}
+                  dataKey="value"
+                >
+                  {pieData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
-                </div>
-              </div>
-            </div>
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
           </div>
-        </main>
-      </div>
+        </div>
 
-      {/* Sidebar overlay for mobile */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+        {/* Recent Orders */}
+        <div className="bg-white rounded-lg shadow">
+          <div className="p-4 border-b">
+            <h3 className="text-md font-semibold">Recent Orders</h3>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead className="bg-gray-50 text-gray-500 uppercase text-xs font-medium">
+                <tr>
+                  <th className="px-4 py-2 text-left">Order ID</th>
+                  <th className="px-4 py-2 text-left">Customer</th>
+                  <th className="px-4 py-2 text-left">Amount</th>
+                  <th className="px-4 py-2 text-left">Status</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {recentOrders.map((order) => (
+                  <tr key={order.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 font-medium text-gray-900">{order.id}</td>
+                    <td className="px-4 py-3">{order.customer}</td>
+                    <td className="px-4 py-3 font-medium">{order.amount}</td>
+                    <td className="px-4 py-3">
+                      <span className={`inline-block px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(order.status)}`}>
+                        {order.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+
+      {/* Bottom Navigation */}
+      <div className="fixed bottom-0 inset-x-0 bg-white border-t shadow-inner flex justify-around items-center py-2 z-50 lg:hidden">
+        <button className="flex flex-col items-center text-sm text-gray-600 hover:text-blue-600">
+          <Users size={20} />
+          <span>Dashboard</span>
+        </button>
+        <button className="flex flex-col items-center text-sm text-gray-600 hover:text-blue-600">
+          <MenuIcon size={20} />
+          <span>Menu</span>
+        </button>
+        <button className="flex flex-col items-center text-sm text-gray-600 hover:text-blue-600">
+          <ShoppingCart size={20} />
+          <span>Orders</span>
+        </button>
+      </div>
     </div>
   )
 }
