@@ -1,5 +1,7 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Plus, Trash2, Edit3, Check, X } from 'lucide-react'
+import axios from 'axios'
+const baseurl = import.meta.env.VITE_BASE_URL;
 
 const Menu = () => {
   const [sections, setSections] = useState([
@@ -21,11 +23,28 @@ const Menu = () => {
     }
   ])
 
+
   const [editingSection, setEditingSection] = useState(null)
   const [editingItem, setEditingItem] = useState(null)
   const [newSectionName, setNewSectionName] = useState('')
   const [newItemName, setNewItemName] = useState('')
   const [newItemPrice, setNewItemPrice] = useState('')
+
+  useEffect(() => {
+    // Fetch initial menu data from API or other source
+    const fetchMenuData = async () => {
+      try {
+        const response = await axios.get(`${baseurl}/menu/getMenuItem`);
+        const data = response.data;
+        console.log(data);
+        setSections(data);
+      } catch (error) {
+        console.error('Error fetching menu data:', error);
+      }
+    };
+
+    fetchMenuData();
+  }, []);
 
   const addSection = () => {
     if (newSectionName.trim()) {
