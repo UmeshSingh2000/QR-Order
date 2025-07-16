@@ -3,8 +3,10 @@ import { Plus, Minus, ShoppingCart } from "lucide-react";
 import "./App.css";
 import axios from "axios";
 import { Toaster, toast } from "react-hot-toast";
+import { io } from 'socket.io-client';
 
 const baseURL = import.meta.env.VITE_BASE_URL;
+const socket = io('http://localhost:3000');
 
 function App() {
   const [cart, setCart] = useState([]);
@@ -27,7 +29,7 @@ function App() {
     fetchMenu();
   }, []);
 
-  console.log(cart);
+
 
   const addToCart = (item, size) => {
     console.log("Adding to cart:", item.itemname, size);
@@ -44,6 +46,10 @@ function App() {
       }
     });
   };
+
+  const orderItemLive = async () => {
+    socket.emit('orderItem', cart)
+  }
 
   const removeFromCart = (itemId, size) => {
     setCart((prevCart) => {
@@ -76,7 +82,6 @@ function App() {
   };
 
   const createOrder = async () => {
-    console.log("click");
     const tableNumber = 5;
     try {
       const response = await axios.post(`${baseURL}/orders/create-order`, {
@@ -87,6 +92,7 @@ function App() {
       console.log(response);
       if (response.status === 201) {
         toast.success("Order Placed Succefully");
+        orderItemLive();
         setCart([]);
         setShowCart(false);
       }
@@ -135,11 +141,10 @@ function App() {
               <button
                 key={category.id}
                 onClick={() => setActiveCategory(category.id)}
-                className={`text-center p-4 rounded-md  cursor-pointer border border-gray-200 shadow-sm text-sm font-medium ${
-                  activeCategory === category.id
-                    ? "bg-amber-300 text-slate-800"
-                    : "text-slate-900 hover:bg-slate-100"
-                }`}
+                className={`text-center p-4 rounded-md  cursor-pointer border border-gray-200 shadow-sm text-sm font-medium ${activeCategory === category.id
+                  ? "bg-amber-300 text-slate-800"
+                  : "text-slate-900 hover:bg-slate-100"
+                  }`}
               >
                 {category.name}
               </button>
@@ -153,17 +158,17 @@ function App() {
               .find((section) => section._id === activeCategory)
               ?.menuitems.map((item) => (
                 <div
-                  key={item._id} 
+                  key={item._id}
                   className="bg-white rounded-xl shadow-sm p-4 flex flex-col gap-4"
                 >
                   <div className="flex items-center justify-between text-sm gap-3 rounded-lg px-3 py-2 w-full border border-gray-200 shadow-sm bg-white hover:shadow-md transition">
-    <h3 className="text-base font-semibold text-slate-800">
-      {item.itemname}
-    </h3>
+                    <h3 className="text-base font-semibold text-slate-800">
+                      {item.itemname}
+                    </h3>
 
-    {/* Optional: Add something like price, category, or a tag on the right */}
-    {/* <span className="text-xs text-gray-500">₹{item.price}</span> */}
-  </div>
+                    {/* Optional: Add something like price, category, or a tag on the right */}
+                    {/* <span className="text-xs text-gray-500">₹{item.price}</span> */}
+                  </div>
 
 
                   {item.price && typeof item.price === "object" ? (
@@ -175,45 +180,45 @@ function App() {
                         );
                         const quantity = cartEntry ? cartEntry.quantity : 0;
 
-                       return (
-  <div
-    key={size}
-    className="flex items-center justify-between text-sm gap-3 rounded-lg px-3 py-2 w-full bg-white hover:shadow-md transition"
-  >
-    <span className="text-sm font-semibold bg-yellow-300 px-2 py-0.5 rounded text-slate-800 whitespace-nowrap">
-      {size.toUpperCase()} - ₹{price}
-    </span>
+                        return (
+                          <div
+                            key={size}
+                            className="flex items-center justify-between text-sm gap-3 rounded-lg px-3 py-2 w-full bg-white hover:shadow-md transition"
+                          >
+                            <span className="text-sm font-semibold bg-yellow-300 px-2 py-0.5 rounded text-slate-800 whitespace-nowrap">
+                              {size.toUpperCase()} - ₹{price}
+                            </span>
 
-    <div className="h-7 flex items-center justify-center">
-      {quantity > 0 ? (
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => removeFromCart(item._id, size)}
-            className="bg-yellow-300  cursor-pointer hover:bg-yellow-400 text-slate-800 w-6 h-6 flex items-center justify-center rounded-full transition"
-          >
-            <Minus size={14} />
-          </button>
-          <span className="text-sm font-semibold w-5 text-center">
-            {quantity}
-          </span>
-          <button
-            onClick={() => addToCart(item, size)}
-            className="bg-yellow-300  cursor-pointer hover:bg-yellow-400 text-slate-800 w-6 h-6 flex items-center justify-center rounded-full transition"
-          >
-            <Plus size={14} />
-          </button>
-        </div>
-      ) : (
-        <button
-          onClick={() => addToCart(item, size)}
-          className="bg-yellow-300  cursor-pointer hover:bg-yellow-400 text-slate-800 text-sm font-medium px-4 py-0.5 rounded-md transition"
-        >
-          Add
-        </button>
-      )}
-    </div>
-  </div>
-);
+                            <div className="h-7 flex items-center justify-center">
+                              {quantity > 0 ? (
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    onClick={() => removeFromCart(item._id, size)}
+                                    className="bg-yellow-300  cursor-pointer hover:bg-yellow-400 text-slate-800 w-6 h-6 flex items-center justify-center rounded-full transition"
+                                  >
+                                    <Minus size={14} />
+                                  </button>
+                                  <span className="text-sm font-semibold w-5 text-center">
+                                    {quantity}
+                                  </span>
+                                  <button
+                                    onClick={() => addToCart(item, size)}
+                                    className="bg-yellow-300  cursor-pointer hover:bg-yellow-400 text-slate-800 w-6 h-6 flex items-center justify-center rounded-full transition"
+                                  >
+                                    <Plus size={14} />
+                                  </button>
+                                </div>
+                              ) : (
+                                <button
+                                  onClick={() => addToCart(item, size)}
+                                  className="bg-yellow-300  cursor-pointer hover:bg-yellow-400 text-slate-800 text-sm font-medium px-4 py-0.5 rounded-md transition"
+                                >
+                                  Add
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        );
 
                       })}
                     </div>
