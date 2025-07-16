@@ -4,11 +4,13 @@ import "./App.css";
 import axios from "axios";
 import { Toaster, toast } from "react-hot-toast";
 import { io } from 'socket.io-client';
+import { useParams } from 'react-router-dom'
 
 const baseURL = import.meta.env.VITE_BASE_URL;
 const socket = io('http://localhost:3000');
 
 function App() {
+  const {tableNumber} = useParams()
   const [cart, setCart] = useState([]);
   const [menuData, setMenuData] = useState([]);
   const [activeCategory, setActiveCategory] = useState(null);
@@ -82,7 +84,6 @@ function App() {
   };
 
   const createOrder = async () => {
-    const tableNumber = 5;
     try {
       const response = await axios.post(`${baseURL}/orders/create-order`, {
         items: cart,
@@ -124,7 +125,7 @@ return (
             <h1 className="text-2xl font-bold text-white drop-shadow-sm">Burger House</h1>
             <p className="text-sm font-medium text-orange-100 flex items-center">
               <Clock size={14} className="mr-1" />
-              Table #12 • Est. 15 min
+              Table {tableNumber}
             </p>
           </div>
         </div>
