@@ -147,7 +147,7 @@ return (
     <div className="flex">
       {/* Sidebar */}
       <div className="w-[25%] bg-white shadow-lg py-6 h-[calc(100vh-80px)] sticky top-20 border-r border-orange-100">
-        <div className="px-4 mb-4">
+        <div className="px-2 mb-4">
           <h2 className="text-lg font-bold text-gray-800 mb-2">Categories</h2>
           <div className="w-12 h-1 bg-gradient-to-r from-orange-400 to-yellow-400 rounded-full"></div>
         </div>
@@ -155,7 +155,7 @@ return (
           {categories.map((category) => (
             <button
               key={category.id}
-              className={`text-center h-16 rounded-md border border-gray-200 shadow-sm text-sm font-medium ${
+              className={`text-center h-20 rounded-md border border-gray-200 shadow-sm text-sm font-medium ${
                 activeCategory === category.id
                   ? "bg-amber-300 text-slate-800"
                   : "text-slate-900 hover:bg-slate-100"
@@ -212,7 +212,7 @@ return (
                             className="flex items-center justify-between bg-white rounded-lg px-4 py-2 shadow-sm hover:shadow-md transition-shadow duration-200"
                           >
                             <div className="flex items-center space-x-3">
-                              <span className="bg-gradient-to-r from-orange-400 to-yellow-400 text-white px-2 rounded-full text-sm font-bold">
+                              <span className="bg-gradient-to-r from-orange-400 to-yellow-400 text-white px-4 py-2 rounded-full text-sm font-bold">
                                 {size.toUpperCase()}
                               </span>
                               <span className="text-lg font-bold text-gray-800">₹{price}</span>
@@ -220,10 +220,10 @@ return (
 
                             <div className="flex items-center">
                               {quantity > 0 ? (
-                                <div className="flex items-center space-x-2 bg-orange-100 rounded-full px-2 py-0.5">
+                                <div className="flex items-center space-x-2 bg-orange-100 rounded-full px-2 py-2">
                                   <button
                                     onClick={() => removeFromCart(item._id, size)}
-                                    className="bg-white hover:bg-orange-200 text-orange-600 w-6 h-6 flex items-center justify-center rounded-full transition-colors duration-200 shadow-sm"
+                                    className="bg-white hover:bg-orange-200 text-orange-600 w-8 h-8 flex items-center justify-center rounded-full transition-colors duration-200 shadow-sm"
                                   >
                                     <Minus size={16} />
                                   </button>
@@ -232,7 +232,7 @@ return (
                                   </span>
                                   <button
                                     onClick={() => addToCart(item, size)}
-                                    className="bg-orange-500 hover:bg-orange-600 text-white w-6 h-6 flex items-center justify-center rounded-full transition-colors duration-200 shadow-sm"
+                                    className="bg-orange-500 hover:bg-orange-600 text-white w-8 h-8 flex items-center justify-center rounded-full transition-colors duration-200 shadow-sm"
                                   >
                                     <Plus size={16} />
                                   </button>
@@ -240,7 +240,7 @@ return (
                               ) : (
                                 <button
                                   onClick={() => addToCart(item, size)}
-                                  className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white font-bold px-2 py-0.5 rounded-full transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
+                                  className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white font-bold px-6 py-1 rounded-full transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
                                 >
                                   Add
                                 </button>
