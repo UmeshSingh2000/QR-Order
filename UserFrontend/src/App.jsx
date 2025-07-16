@@ -47,8 +47,8 @@ function App() {
     });
   };
 
-  const orderItemLive = async () => {
-    socket.emit('orderItem', cart)
+  const orderItemLive = async (tableNumber) => {
+    socket.emit('orderItem', cart,tableNumber)
   }
 
   const removeFromCart = (itemId, size) => {
@@ -92,7 +92,7 @@ function App() {
       console.log(response);
       if (response.status === 201) {
         toast.success("Order Placed Succefully");
-        orderItemLive();
+        orderItemLive(tableNumber);
         setCart([]);
         setShowCart(false);
       }

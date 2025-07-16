@@ -6,6 +6,7 @@ require('dotenv').config();
 const connectDB = require('./Database/connection');
 const authenticateToken = require('./Middleware/authenticateToken');
 const Menu = require('./Database/Models/menuSchema');
+const mongoose = require('mongoose');
 
 // Express app
 const app = express();
@@ -55,19 +56,50 @@ app.get('/api/authcheck', authenticateToken, (req, res) => {
 });
 
 
+
 io.on('connection', (socket) => {
-    console.log('New client connected:', socket.id);
+  console.log('New client connected:', socket.id);
 
-    socket.on('disconnect', () => {
-        console.log('Client disconnected:', socket.id);
-    });
+  socket.on('disconnect', () => {
+    console.log('Client disconnected:', socket.id);
+  });
 
-    socket.on('orderItem', (order) => {
-        console.log('Message received:', order);
+  socket.on('orderItem', async (orderItems,table) => {
+    try {
+      const response = [];
 
-        io.emit('orderReceive', order);
-    });
+      for (const order of orderItems) {
+        const objectId = new mongoose.Types.ObjectId(order.itemId);
+
+        // Find the menu document that contains the itemId
+        const menuDoc = await Menu.findOne({
+          'menuitems._id': objectId
+        });
+
+        if (!menuDoc) continue;
+
+        // Extract the specific item
+        const matchedItem = menuDoc.menuitems.id(order.itemId);
+
+        if (matchedItem) {
+          const itemname = matchedItem.itemname;
+          const price = matchedItem.price?.get(order.size) || 0;
+
+          response.push({
+            itemname,
+            size: order.size,
+            quantity: order.quantity,
+            price
+          });
+        }
+      }
+      io.emit('orderReceive', response,table); // send the enriched item list
+    } catch (error) {
+      console.error('Error fetching menu items:', error);
+    }
+  });
 });
+
 
 
 server.listen(port, () => {
@@ -75,15 +107,3 @@ server.listen(port, () => {
 });
 
 
-
-const fetchItem = async(id)=>{
-    try {
-        const item = await Menu.findById(id);
-        if (!item) {
-            throw new Error('Item not found');
-        }
-        return item;
-    } catch (error) {
-        
-    }
-}
