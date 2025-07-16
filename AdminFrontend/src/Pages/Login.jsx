@@ -34,9 +34,9 @@ const Login = () => {
       <div className="flex-1 flex items-center justify-center px-6 py-8">
         <div className="w-full max-w-sm">
           <div className="text-center mb-8">
-            <div className="w-20 h-20 bg-white bg-opacity-20 backdrop-blur-sm rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl">
+            {/* <div className="w-20 h-20 bg-white bg-opacity-20 backdrop-blur-sm rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl">
               <Lock className="w-10 h-10 text-white" />
-            </div>
+            </div> */}
             <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
             <p className="text-blue-100 text-lg">Sign in to continue</p>
           </div>
@@ -95,7 +95,7 @@ const Login = () => {
             </div>
 
             {/* Remember Me & Forgot Password */}
-            <div className="flex items-center justify-between">
+            {/* <div className="flex items-center justify-between">
               <label className="flex items-center">
                 <input
                   type="checkbox"
@@ -106,7 +106,7 @@ const Login = () => {
               <a href="#" className="text-sm text-blue-600 hover:text-blue-500 font-semibold">
                 Forgot?
               </a>
-            </div>
+            </div> */}
 
             {/* Submit Button */}
             <button
@@ -126,14 +126,14 @@ const Login = () => {
             </button>
 
             {/* Divider */}
-            <div className="flex items-center my-6">
+            {/* <div className="flex items-center my-6">
               <div className="flex-1 border-t border-gray-300"></div>
               <span className="px-4 text-sm text-gray-500 bg-white">Or</span>
               <div className="flex-1 border-t border-gray-300"></div>
-            </div>
+            </div> */}
 
             {/* Social Login Options */}
-            <div className="space-y-3">
+            {/* <div className="space-y-3">
               <button className="w-full flex items-center justify-center px-4 py-4 border-2 border-gray-200 rounded-2xl hover:bg-gray-50 transition-colors">
                 <svg className="w-6 h-6 mr-3" viewBox="0 0 24 24">
                   <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -149,20 +149,20 @@ const Login = () => {
                 </svg>
                 <span className="text-base font-semibold text-gray-700">Continue with Facebook</span>
               </button>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
 
       {/* Bottom Sign Up Link */}
-      <div className="p-6 text-center">
+      {/* <div className="p-6 text-center">
         <p className="text-white text-base">
           Don't have an account?{' '}
           <a href="#" className="text-yellow-200 hover:text-yellow-100 font-bold underline">
             Sign up here
           </a>
         </p>
-      </div>
+      </div> */}
     </div>
   );
 };
