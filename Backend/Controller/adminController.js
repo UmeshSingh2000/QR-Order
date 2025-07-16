@@ -12,9 +12,9 @@ const comparePassword = async (password,hashedPassword)=>{
     }
 }
 
-const generateAuthToken = function() {
-    const token = jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
-        expiresIn: '1h'
+const generateAuthToken = function(adminId) {
+    const token = jwt.sign({ id: adminId }, process.env.JWT_SECRET, {
+        expiresIn: '1d'
     });
     return token;
 };
@@ -33,7 +33,7 @@ const adminLogin = async (req, res) => {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
 
-        const token = admin.generateAuthToken();
+        const token = generateAuthToken(admin._id);
         res.status(200).json({ token });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
