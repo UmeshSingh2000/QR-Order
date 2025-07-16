@@ -106,27 +106,25 @@ function App() {
   return (
     <div className="bg-slate-50">
       <Toaster />
-      <div className="bg-amber-400 shadow-sm sticky top-0 z-40 w-full">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-800">Burger House</h1>
-            <p className="text-sm font-bold text-[#6b240c] flex items-center">
-              🍽️ Table #12
-            </p>
-          </div>
-          <button
-            onClick={() => setShowCart(!showCart)}
-            className="relative  cursor-pointer bg-slate-800 text-white p-3 rounded-full hover:bg-slate-700"
-          >
-            <ShoppingCart size={20} />
-            {getCartItemCount() > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center">
-                {getCartItemCount()}
-              </span>
-            )}
-          </button>
-        </div>
-      </div>
+      <div className="bg-white border-b sticky top-0 z-40 w-full shadow-sm">
+  <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+    <div>
+      <h1 className="text-2xl font-bold text-slate-800">Burger House</h1>
+      <p className="text-sm font-medium text-slate-500 flex items-center">🍽️ Table #12</p>
+    </div>
+    <button
+      onClick={() => setShowCart(!showCart)}
+      className="relative cursor-pointer bg-slate-700 text-white p-3 rounded-full hover:bg-slate-600 transition"
+    >
+      <ShoppingCart size={20} />
+      {getCartItemCount() > 0 && (
+        <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center">
+          {getCartItemCount()}
+        </span>
+      )}
+    </button>
+  </div>
+</div>
 
       <div className="flex">
         <div className="w-[25%] bg-slate-50 shadow-md py-4 h-[calc(100vh-80px)] sticky top-20">
