@@ -12,6 +12,13 @@ const comparePassword = async (password,hashedPassword)=>{
     }
 }
 
+const generateAuthToken = function() {
+    const token = jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
+        expiresIn: '1h'
+    });
+    return token;
+};
+
 const adminLogin = async (req, res) => {
     const { email, password } = req.body;
 
@@ -45,8 +52,7 @@ const adminSignup = async (req, res) => {
         const admin = new Admin({ name, email, password, phone, restaurantName });
         await admin.save();
 
-        const token = admin.generateAuthToken();
-        res.status(201).json({ token });
+        res.status(201).json({ message: 'Admin registered successfully' });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
