@@ -1,5 +1,5 @@
 const Admin = require('../Database/Models/adminSchema');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 
 
 const comparePassword = async (password,hashedPassword)=>{

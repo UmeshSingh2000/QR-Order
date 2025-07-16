@@ -99,7 +99,38 @@ const addMultipleMenuItems = async (req, res) => {
   }
 };
 
+const deleteMenuItem = async (req,res)=>{
+    const { sectionname, itemname } = req.body;
+
+    if (!sectionname || !itemname) {
+        return res.status(400).json({ message: 'sectionname and itemname are required' });
+    }
+
+    try {
+        const section = await Menu.findOne({ sectionname });
+
+        if (!section) {
+            return res.status(404).json({ message: 'Section not found' });
+        }
+
+        const itemIndex = section.menuitems.findIndex(item => item.itemname.toLowerCase() === itemname.toLowerCase());
+
+        if (itemIndex === -1) {
+            return res.status(404).json({ message: 'Item not found in this section' });
+        }
+
+        section.menuitems.splice(itemIndex, 1);
+        await section.save();
+
+        res.status(200).json({ message: 'Item deleted successfully', section });
+    } catch (error) {
+        console.error('Error deleting menu item:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+}
+
 module.exports = {
     addMenuItem,
-    addMultipleMenuItems
+    addMultipleMenuItems,
+    deleteMenuItem
 };
