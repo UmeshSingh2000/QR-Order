@@ -9,12 +9,11 @@ const menuSchema = mongoose.Schema({
     {
       itemname: {
         type: String,
-        required: true
+        
       },
       price: {
         type: Map,
         of: Number, // allows dynamic sizes like half/full or small/medium/large
-        required: true
       }
     }
   ]

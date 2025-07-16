@@ -1,6 +1,28 @@
 const Menu = require('../Database/Models/menuSchema');
 
-
+const createSection = async (req,res)=>{
+    const { sectionname } = req.body;
+    
+    if (!sectionname) {
+        return res.status(400).json({ message: 'sectionname is required' });
+    }
+    
+    try {
+        const existingSection = await Menu.findOne({ sectionname });
+    
+        if (existingSection) {
+        return res.status(400).json({ message: 'Section already exists' });
+        }
+    
+        const newSection = new Menu({ sectionname });
+        await newSection.save();
+    
+        res.status(201).json({ message: 'Section created successfully', section: newSection });
+    } catch (error) {
+        console.error('Error creating section:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+}
 
 const addMenuItem = async (req, res) => {
   const { sectionname, itemname, price } = req.body;
