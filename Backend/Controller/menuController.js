@@ -129,7 +129,8 @@ const addMultipleMenuItems = async (req, res) => {
 
 
 const deleteMenuItem = async (req, res) => {
-    const { sectionname, itemname } = req.body;
+    // const { sectionname, itemname } = req.body;
+    const {sectionname,itemname} = req.params
 
     if (!sectionname || !itemname) {
         return res.status(400).json({ message: 'sectionname and itemname are required' });
@@ -157,6 +158,27 @@ const deleteMenuItem = async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 }
+const deleteSection = async (req,res)=>{
+    try {
+        const { sectionname } = req.params;
+
+        if (!sectionname) {
+            return res.status(400).json({ message: 'sectionname is required' });
+        }
+
+        const section = await Menu.findOneAndDelete({ sectionname });
+
+        if (!section) {
+            return res.status(404).json({ message: 'Section not found' });
+        }
+
+        res.status(200).json({ message: 'Section deleted successfully', section });
+    } catch (error) {
+        console.error('Error deleting section:', error);
+        res.status(500).json({ message: 'Server error' });
+        
+    }
+}
 
 const getMenuItem = async (req, res) => {
     try {
@@ -176,5 +198,7 @@ module.exports = {
     addMenuItem,
     addMultipleMenuItems,
     deleteMenuItem,
-    getMenuItem
+    getMenuItem,
+    deleteSection,
+    createSection
 };
