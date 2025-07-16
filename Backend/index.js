@@ -3,6 +3,7 @@ const app = express();
 const cors = require('cors');
 require('dotenv').config();
 const connectDB = require('./Database/connection');
+const authenticateToken = require('./Middleware/authenticateToken');
 connectDB();
 const port = process.env.PORT || 3000;
 app.use(express.json())
@@ -28,6 +29,11 @@ app.get('/', (req, res) => {
 app.use('/api/menu',require('./Routes/menuRoutes'));
 app.use('/api/orders', require('./Routes/orderRoutes'));
 app.use('/api/admin', require('./Routes/adminRoutes'));
+
+
+app.get('/api/authcheck',authenticateToken, (req, res) => {
+    res.status(200).json({message : "Authenticated"});
+})
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);

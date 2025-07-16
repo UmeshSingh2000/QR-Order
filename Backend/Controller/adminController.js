@@ -1,5 +1,6 @@
 const Admin = require('../Database/Models/adminSchema');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 
 const comparePassword = async (password,hashedPassword)=>{
@@ -49,11 +50,12 @@ const adminSignup = async (req, res) => {
             return res.status(400).json({ message: 'Admin already exists' });
         }
 
-        const admin = new Admin({ name, email, password, phone, restaurantName });
+        const admin = new Admin({ name, email, password : await bcrypt.hash(password,10), phone, restaurantName });
         await admin.save();
 
         res.status(201).json({ message: 'Admin registered successfully' });
     } catch (error) {
+        console.log('Error during admin signup:', error);
         res.status(500).json({ message: 'Server error' });
     }
 };
