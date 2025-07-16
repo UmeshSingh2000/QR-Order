@@ -4,6 +4,7 @@ import "./App.css";
 import axios from "axios";
 import { Toaster, toast } from "react-hot-toast";
 import { io } from 'socket.io-client';
+import {useParams} from 'react-router-dom';
 
 const baseURL = import.meta.env.VITE_BASE_URL;
 const socket = io('http://localhost:3000');
@@ -14,6 +15,7 @@ function App() {
   const [activeCategory, setActiveCategory] = useState(null);
   const [showCart, setShowCart] = useState(false);
   const [selectedSizes, setSelectedSizes] = useState({});
+  const {tableNumber} = useParams();
 
   useEffect(() => {
     const fetchMenu = async () => {
@@ -82,7 +84,6 @@ function App() {
   };
 
   const createOrder = async () => {
-    const tableNumber = 5;
     try {
       const response = await axios.post(`${baseURL}/orders/create-order`, {
         items: cart,
@@ -111,6 +112,7 @@ function App() {
 
 return (
   <div className="bg-gradient-to-br from-orange-50 to-yellow-50 min-h-screen">
+    <Toaster />
     {/* Header */}
     <div className="bg-gradient-to-r from-orange-500 to-yellow-500 shadow-lg sticky top-0 z-40 w-full">
       <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
@@ -124,7 +126,7 @@ return (
             <h1 className="text-2xl font-bold text-white drop-shadow-sm">Burger House</h1>
             <p className="text-sm font-medium text-orange-100 flex items-center">
               <Clock size={14} className="mr-1" />
-              Table #12 • Est. 15 min
+              Table #{tableNumber} • Est. 15 min
             </p>
           </div>
         </div>
@@ -149,11 +151,11 @@ return (
           <h2 className="text-lg font-bold text-gray-800 mb-2">Categories</h2>
           <div className="w-12 h-1 bg-gradient-to-r from-orange-400 to-yellow-400 rounded-full"></div>
         </div>
-        <div className="flex flex-col space-y-2 px-4">
+        <div className="flex flex-col space-y-2 px-2">
           {categories.map((category) => (
             <button
               key={category.id}
-              className={`text-center p-4 rounded-md border border-gray-200 shadow-sm text-sm font-medium ${
+              className={`text-center h-16 rounded-md border border-gray-200 shadow-sm text-sm font-medium ${
                 activeCategory === category.id
                   ? "bg-amber-300 text-slate-800"
                   : "text-slate-900 hover:bg-slate-100"
@@ -168,7 +170,7 @@ return (
 
       {/* Main Content */}
       <div className="flex-1 w-[75%] select-none">
-        <div className="max-w-4xl mx-auto px-6 py-8">
+        <div className="max-w-4xl mx-auto px-2 py-8">
           <div className="mb-6">
             <h2 className="text-3xl font-bold text-gray-800 mb-2">
               {categories.find((c) => c.id === activeCategory)?.name}
@@ -176,7 +178,7 @@ return (
             <div className="w-16 h-1 bg-gradient-to-r from-orange-400 to-yellow-400 rounded-full"></div>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-4">
             {menuData
               .find((section) => section._id === activeCategory)
               ?.menuitems.map((item) => (
@@ -197,7 +199,7 @@ return (
 
                   {/* Price/Size Options */}
                   {item.price && typeof item.price === "object" ? (
-                    <div className="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-xl p-2 border border-orange-200 space-y-4">
+                    <div className="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-xl p-2 border border-orange-200 space-y-2">
                       {Object.entries(item.price).map(([size, price]) => {
                         const cartEntry = cart.find(
                           (entry) => entry.itemId === item._id && entry.size === size
@@ -218,7 +220,7 @@ return (
 
                             <div className="flex items-center">
                               {quantity > 0 ? (
-                                <div className="flex items-center space-x-3 bg-orange-100 rounded-full px-2 py-1">
+                                <div className="flex items-center space-x-2 bg-orange-100 rounded-full px-2 py-0.5">
                                   <button
                                     onClick={() => removeFromCart(item._id, size)}
                                     className="bg-white hover:bg-orange-200 text-orange-600 w-6 h-6 flex items-center justify-center rounded-full transition-colors duration-200 shadow-sm"
@@ -266,19 +268,19 @@ return (
     {/* Cart Modal */}
     {showCart && cart.length > 0 && (
       <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl max-h-[80vh] overflow-hidden">
+        <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl max-h-[80vh] overflow-y-auto scrollbar-hidden">
           {/* Cart Header */}
           <div className="bg-gradient-to-r from-orange-500 to-yellow-500 p-6 text-white">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-bold">Your Order</h2>
               <button
                 onClick={() => setShowCart(false)}
-                className="bg-white bg-opacity-20 hover:bg-opacity-30 p-2 rounded-full transition-all duration-200"
+                className="bg-white text-orange-600 bg-opacity-20 hover:bg-opacity-30 p-2 rounded-full transition-all duration-200"
               >
                 <X size={20} />
               </button>
             </div>
-            <p className="text-orange-100 mt-1">Table #12</p>
+            <p className="text-orange-100 mt-1">Table #{tableNumber}</p>
           </div>
 
           {/* Cart Items */}
@@ -299,7 +301,7 @@ return (
                     <h4 className="font-bold text-gray-800 mb-1">
                       {item.itemname}
                     </h4>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center justify-center gap-6 space-x-2">
                       <span className="bg-orange-200 text-orange-800 px-2 py-1 rounded-full text-xs font-medium">
                         {size.toUpperCase()}
                       </span>
