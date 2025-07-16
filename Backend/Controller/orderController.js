@@ -3,7 +3,6 @@ const Order = require('../Database/Models/orderSchema');
 const createOrder = async (req, res) => {
     try {
         const { tableNumber, items, totalAmount } = req.body;
-        console.log(req.body);
 
         if (!items || !Array.isArray(items) || items.length === 0) {
             return res.status(400).json({ message: 'Order must include at least one item' });
