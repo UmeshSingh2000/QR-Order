@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+const baseurl = import.meta.env.VITE_BASE_URL;
 
 const Login = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -20,10 +24,13 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
+
+   const response = await axios.post(`${baseurl}/admin/login`, formData);
+    if (response.data.success) {
+      navigate('/admin/orders');
+    } else {
+      console.log('Login failed:', response.data.message);
+    }
     console.log('Login data:', formData);
     setIsLoading(false);
   };
