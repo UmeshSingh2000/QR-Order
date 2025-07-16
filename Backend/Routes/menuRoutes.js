@@ -5,6 +5,6 @@ const router = express.Router();
 router.get('/getMenuItem',getMenuItem)
 router.post('/addMenuItem', addMenuItem);
 router.post('/addMultipleMenuItems',addMultipleMenuItems)
-router.delete('/deleteMenuItem', deleteMenuItem);
+router.delete('/deleteMenuItem/:sectionname/:itemname', deleteMenuItem);
 router.delete('/deleteSection', deleteSection);
 module.exports = router;

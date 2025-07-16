@@ -131,9 +131,8 @@ const addMultipleMenuItems = async (req, res) => {
 
 
 const deleteMenuItem = async (req, res) => {
-    const { sectionname, itemname } = req.body;
-
-    console.log('Delete request received:', { sectionname, itemname });
+    // const { sectionname, itemname } = req.body;
+    const {sectionname,itemname} = req.params
 
     if (!sectionname || !itemname) {
         return res.status(400).json({ message: 'sectionname and itemname are required' });

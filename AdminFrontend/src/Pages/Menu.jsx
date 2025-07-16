@@ -75,25 +75,24 @@ const Menu = () => {
   };
 
   const deleteItem = async (sectionname, itemname) => {
-    console.log('Delete request:', { sectionname, itemname });
-    try{
-          const response = await axios.delete(`${baseurl}/menu/deleteMenuItem`,{sectionname, itemname});
-          if (response.status === 200) {
-      setSections(
-        sections.map((section) =>
-          section.sectionname === sectionname
-            ? {
+    try {
+      const response = await axios.delete(`${baseurl}/menu/deleteMenuItem/${sectionname}/${itemname}`);
+      if (response.status === 200) {
+        setSections(
+          sections.map((section) =>
+            section.sectionname === sectionname
+              ? {
                 ...section,
                 menuitems: section.menuitems.filter((item) => item.itemname !== itemname),
               }
-            : section
-        )
-      );
+              : section
+          )
+        );
+      }
     }
-  }
-  catch(error){
-    console.error("Error deleting menu item:", error);
-  }
+    catch (error) {
+      console.error("Error deleting menu item:", error);
+    }
   };
 
   const updateItem = (sectionId, itemId, newName, updatedPrices) => {
@@ -101,13 +100,13 @@ const Menu = () => {
       sections.map((section) =>
         section._id === sectionId
           ? {
-              ...section,
-              menuitems: section.menuitems.map((item) =>
-                item._id === itemId
-                  ? { ...item, itemname: newName, price: updatedPrices }
-                  : item
-              ),
-            }
+            ...section,
+            menuitems: section.menuitems.map((item) =>
+              item._id === itemId
+                ? { ...item, itemname: newName, price: updatedPrices }
+                : item
+            ),
+          }
           : section
       )
     );
