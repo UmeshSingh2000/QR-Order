@@ -25,9 +25,15 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
 
-   const response = await axios.post(`${baseurl}/api/admin/login`, formData);
-    if (response.data.success) {
-      navigate('/admin/orders');
+   const response = await axios.post(`${baseurl}/admin/login`, formData);
+    console.log('Response:', response.data);
+    const token = response.data.token;
+    if (token) {
+      localStorage.setItem('token', token);
+      setFormData({ email: '', password: '' });
+    }
+    if (response.data) {
+      navigate('/admin/dashboard');
     } else {
       console.log('Login failed:', response.data.message);
     }

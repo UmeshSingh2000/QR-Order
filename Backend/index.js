@@ -31,7 +31,7 @@ app.use('/api/orders', require('./Routes/orderRoutes'));
 app.use('/api/admin', require('./Routes/adminRoutes'));
 
 
-app.get('/authcheck',authenticateToken, (req, res) => {
+app.get('/api/authcheck',authenticateToken, (req, res) => {
     res.status(200).json({message : "Authenticated"});
 })
 

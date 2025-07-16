@@ -1,5 +1,6 @@
 const Admin = require('../Database/Models/adminSchema');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 
 const comparePassword = async (password,hashedPassword)=>{
