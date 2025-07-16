@@ -76,14 +76,14 @@ server.listen(port, () => {
 
 
 
-// const fetchItem = async(id)=>{
-//     try {
-//         const item = await Menu.findById(id);
-//         if (!item) {
-//             throw new Error('Item not found');
-//         }
-//         return item;
-//     } catch (error) {
+const fetchItem = async(id)=>{
+    try {
+        const item = await Menu.findById(id);
+        if (!item) {
+            throw new Error('Item not found');
+        }
+        return item;
+    } catch (error) {
         
-//     }
-// }
+    }
+}
