@@ -11,7 +11,8 @@ app.use(express.json())
 app.get('/', (req, res) => {
     res.send('server is running')
 })
-app.use('/api',require('./Routes/menuRoutes'),require('./Routes/orderRoutes'),require('./Routes/adminRoutes'));
+app.use('/api/menu',require('./Routes/menuRoutes'));
+app.use('/api/orders', require('./Routes/orderRoutes'));
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
