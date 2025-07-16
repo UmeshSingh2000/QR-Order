@@ -13,6 +13,7 @@ app.get('/', (req, res) => {
 })
 app.use('/api/menu',require('./Routes/menuRoutes'));
 app.use('/api/orders', require('./Routes/orderRoutes'));
+app.use('/api/admin', require('./Routes/adminRoutes'));
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
