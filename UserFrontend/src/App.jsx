@@ -122,7 +122,7 @@ function App() {
           </div>
           <button
             onClick={() => setShowCart(!showCart)}
-            className="relative bg-slate-800 text-white p-3 rounded-full hover:bg-slate-700"
+            className="relative  cursor-pointer bg-slate-800 text-white p-3 rounded-full hover:bg-slate-700"
           >
             <ShoppingCart size={20} />
             {getCartItemCount() > 0 && (
@@ -141,10 +141,11 @@ function App() {
               <button
                 key={category.id}
                 onClick={() => setActiveCategory(category.id)}
-                className={`text-center p-4 rounded-md border border-gray-200 shadow-sm text-sm font-medium ${activeCategory === category.id
-                  ? "bg-amber-300 text-slate-800"
-                  : "text-slate-900 hover:bg-slate-100"
-                  }`}
+                className={`text-center p-4 rounded-md  cursor-pointer border border-gray-200 shadow-sm text-sm font-medium ${
+                  activeCategory === category.id
+                    ? "bg-amber-300 text-slate-800"
+                    : "text-slate-900 hover:bg-slate-100"
+                }`}
               >
                 {category.name}
               </button>
@@ -158,7 +159,7 @@ function App() {
               .find((section) => section._id === activeCategory)
               ?.menuitems.map((item) => (
                 <div
-                  key={item._id}
+                  key={item._id} 
                   className="bg-white rounded-xl shadow-sm p-4 flex flex-col gap-4"
                 >
                   <div className="flex items-center justify-between text-sm gap-3 rounded-lg px-3 py-2 w-full border border-gray-200 shadow-sm bg-white hover:shadow-md transition">
@@ -189,36 +190,36 @@ function App() {
                               {size.toUpperCase()} - ₹{price}
                             </span>
 
-                            <div className="h-7 flex items-center justify-center">
-                              {quantity > 0 ? (
-                                <div className="flex items-center gap-2">
-                                  <button
-                                    onClick={() => removeFromCart(item._id, size)}
-                                    className="bg-yellow-300 hover:bg-yellow-400 text-slate-800 w-6 h-6 flex items-center justify-center rounded-full transition"
-                                  >
-                                    <Minus size={14} />
-                                  </button>
-                                  <span className="text-sm font-semibold w-5 text-center">
-                                    {quantity}
-                                  </span>
-                                  <button
-                                    onClick={() => addToCart(item, size)}
-                                    className="bg-yellow-300 hover:bg-yellow-400 text-slate-800 w-6 h-6 flex items-center justify-center rounded-full transition"
-                                  >
-                                    <Plus size={14} />
-                                  </button>
-                                </div>
-                              ) : (
-                                <button
-                                  onClick={() => addToCart(item, size)}
-                                  className="bg-yellow-300 hover:bg-yellow-400 text-slate-800 text-sm font-medium px-4 py-0.5 rounded-md transition"
-                                >
-                                  Add
-                                </button>
-                              )}
-                            </div>
-                          </div>
-                        );
+    <div className="h-7 flex items-center justify-center">
+      {quantity > 0 ? (
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => removeFromCart(item._id, size)}
+            className="bg-yellow-300  cursor-pointer hover:bg-yellow-400 text-slate-800 w-6 h-6 flex items-center justify-center rounded-full transition"
+          >
+            <Minus size={14} />
+          </button>
+          <span className="text-sm font-semibold w-5 text-center">
+            {quantity}
+          </span>
+          <button
+            onClick={() => addToCart(item, size)}
+            className="bg-yellow-300  cursor-pointer hover:bg-yellow-400 text-slate-800 w-6 h-6 flex items-center justify-center rounded-full transition"
+          >
+            <Plus size={14} />
+          </button>
+        </div>
+      ) : (
+        <button
+          onClick={() => addToCart(item, size)}
+          className="bg-yellow-300  cursor-pointer hover:bg-yellow-400 text-slate-800 text-sm font-medium px-4 py-0.5 rounded-md transition"
+        >
+          Add
+        </button>
+      )}
+    </div>
+  </div>
+);
 
                       })}
                     </div>
@@ -243,7 +244,7 @@ function App() {
               <h2 className="text-xl font-bold text-slate-800">Your Order</h2>
               <button
                 onClick={() => setShowCart(false)}
-                className="text-slate-500 hover:text-slate-700"
+                className="text-slate-500  cursor-pointer hover:text-slate-700"
               >
                 ✕
               </button>
@@ -273,14 +274,14 @@ function App() {
                     <div className="flex items-center space-x-2">
                       <button
                         onClick={() => removeFromCart(itemId, size)}
-                        className="w-6 h-6 bg-slate-100 rounded-full flex items-center justify-center"
+                        className="w-6 h-6 bg-slate-100  cursor-pointer rounded-full flex items-center justify-center"
                       >
                         <Minus size={14} />
                       </button>
                       <span>{quantity}</span>
                       <button
                         onClick={() => addToCart(item, size)}
-                        className="w-6 h-6 bg-slate-800 text-white rounded-full flex items-center justify-center"
+                        className="w-6 h-6 bg-slate-800 cursor-pointer text-white rounded-full flex items-center justify-center"
                       >
                         <Plus size={14} />
                       </button>
@@ -298,7 +299,7 @@ function App() {
               </div>
 
               <button
-                className="w-full bg-slate-800 text-white py-4 rounded-xl font-medium hover:bg-slate-700"
+                className="w-full cursor-pointer bg-slate-800 text-white py-4 rounded-xl font-medium hover:bg-slate-700"
                 onClick={createOrder}
               >
                 Place Order
@@ -312,7 +313,7 @@ function App() {
         (getCartItemCount() > 0 ? (
           <button
             onClick={() => setShowCart(true)}
-            className="fixed bottom-6 right-6 bg-slate-800 text-white p-4 rounded-full shadow-lg hover:bg-slate-700"
+            className="fixed  cursor-pointer bottom-6 right-6 bg-slate-800 text-white p-4 rounded-full shadow-lg hover:bg-slate-700"
           >
             <div className="flex items-center space-x-2">
               <ShoppingCart size={20} />
