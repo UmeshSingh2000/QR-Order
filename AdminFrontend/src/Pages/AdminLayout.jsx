@@ -4,8 +4,10 @@ import {
   ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell
 } from 'recharts'
 import { Users, ShoppingCart, DollarSign, TrendingUp, Bell, Search, Settings, Menu as MenuIcon } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
 const AdminLayout = () => {
+  const navigate = useNavigate()
   const stats = [
     { id: 1, name: 'Total Users', value: '12,345', change: '+12%', icon: Users, color: 'bg-blue-500' },
     { id: 2, name: 'Total Orders', value: '8,721', change: '+5%', icon: ShoppingCart, color: 'bg-green-500' },
@@ -172,15 +174,15 @@ const AdminLayout = () => {
 
       {/* Bottom Navigation */}
       <div className="fixed bottom-0 inset-x-0 bg-white border-t shadow-inner flex justify-around items-center py-2 z-50 lg:hidden">
-        <button className="flex flex-col items-center text-sm text-gray-600 hover:text-blue-600">
+        <button onClick={() => navigate('/admin/dashboard')} className="flex flex-col items-center text-sm text-gray-600 hover:text-blue-600">
           <Users size={20} />
           <span>Dashboard</span>
         </button>
-        <button className="flex flex-col items-center text-sm text-gray-600 hover:text-blue-600">
+        <button onClick={() => navigate('/admin/menu')} className="flex flex-col items-center text-sm text-gray-600 hover:text-blue-600">
           <MenuIcon size={20} />
           <span>Menu</span>
         </button>
-        <button className="flex flex-col items-center text-sm text-gray-600 hover:text-blue-600">
+        <button onClick={() => navigate('/admin/orders')} className="flex flex-col items-center text-sm text-gray-600 hover:text-blue-600">
           <ShoppingCart size={20} />
           <span>Orders</span>
         </button>
