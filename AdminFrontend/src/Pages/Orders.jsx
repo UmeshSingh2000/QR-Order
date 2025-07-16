@@ -1,7 +1,11 @@
 import React, { useState } from 'react'
 import { Plus, Clock, CheckCircle, XCircle, Eye, Edit3, Trash2 } from 'lucide-react'
+import {Users, ShoppingCart , Menu as MenuIcon} from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
 
 const Orders = () => {
+  const navigate = useNavigate()
   const [orders, setOrders] = useState([
     {
       id: 1,
@@ -48,6 +52,7 @@ const Orders = () => {
     items: []
   })
   const [newItem, setNewItem] = useState({ name: '', price: '', quantity: 1 })
+    const [activeTab, setActiveTab] = useState('orders');
 
   const statusColors = {
     pending: 'bg-yellow-100 text-yellow-800 border-yellow-200',
@@ -339,6 +344,29 @@ const Orders = () => {
           </div>
         )}
       </div>
+      <div className="fixed bottom-0 inset-x-0 bg-white/90 backdrop-blur-xl border-t border-white/20 shadow-2xl flex justify-around items-center py-3 z-50 lg:hidden">
+              {[
+                { id: 'dashboard', icon: Users, label: 'Dashboard', path: '/admin/dashboard' },
+                { id: 'menu', icon: MenuIcon, label: 'Menu', path: '/admin/menu' },
+                { id: 'orders', icon: ShoppingCart, label: 'Orders', path: '/admin/orders' },
+              ].map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    setActiveTab(item.id);
+                    navigate(item.path);
+                  }}
+                  className={`flex flex-col items-center text-xs transition-all duration-200 p-2 rounded-lg ${
+                    activeTab === item.id
+                      ? 'text-purple-600 bg-purple-50'
+                      : 'text-gray-600 hover:text-purple-600 hover:bg-gray-50'
+                  }`}
+                >
+                  <item.icon size={20} className="mb-1" />
+                  <span className="font-medium">{item.label}</span>
+                </button>
+              ))}
+            </div>
     </div>
   )
 }
