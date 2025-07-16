@@ -35,8 +35,16 @@ const Menu = () => {
     }
   };
 
-  const deleteSection = (sectionName) => {
-    setSections(sections.filter((section) => section._id !== sectionId));
+  const deleteSection = async (sectionname) => {
+    try {
+      const response = await axios.delete(`${baseurl}/menu/deleteSection/${sectionname}`);
+      if (response.status === 200) {
+        setSections(sections.filter(section => section.sectionname !== sectionname));
+      }
+    }
+    catch (error) {
+      console.error("Error deleting section:", error);
+    }
   };
 
   const updateSectionName = (sectionId, newName) => {
@@ -165,14 +173,14 @@ const Menu = () => {
                 <div className="flex justify-between items-center">
                   <h2 className="font-semibold text-gray-800">{section.sectionname}</h2>
                   <div className="flex gap-2">
-                    <button
+                    {/* <button
                       onClick={() => setEditingSection(section._id)}
                       className="text-blue-600 hover:text-blue-800"
                     >
                       <Edit3 size={16} />
-                    </button>
+                    </button> */}
                     <button
-                      onClick={() => deleteSection(section._id)}
+                      onClick={() => deleteSection(section.sectionname)}
                       className="text-red-600 hover:text-red-800"
                     >
                       <Trash2 size={16} />
@@ -255,9 +263,9 @@ const Menu = () => {
                               ))}
                               <td className="px-4 py-2 text-right">
                                 <div className="flex justify-end gap-2">
-                                  <button onClick={() => setEditingItem(item._id)} className="text-blue-600 hover:text-blue-800">
+                                  {/* <button onClick={() => setEditingItem(item._id)} className="text-blue-600 hover:text-blue-800">
                                     <Edit3 size={16} />
-                                  </button>
+                                  </button> */}
                                   <button onClick={() => deleteItem(section.sectionname, item.itemname)} className="text-red-600 hover:text-red-800">
                                     <Trash2 size={16} />
                                   </button>
