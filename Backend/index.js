@@ -18,7 +18,7 @@ const server = http.createServer(app);
 // Create WebSocket server
 const io = new Server(server, {
     cors: {
-        origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175','https://qradmin-brown.vercel.app'],
+        origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175','https://qradmin-brown.vercel.app','https://qr-order-dun.vercel.app'],
         methods: ['GET', 'POST']
     }
 });
@@ -29,7 +29,7 @@ connectDB();
 // Middlewares
 app.use(express.json());
 
-const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175','https://qradmin-brown.vercel.app'];
+const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175','https://qradmin-brown.vercel.app','https://qr-order-dun.vercel.app'];
 
 app.use(cors({
     origin: function (origin, callback) {
