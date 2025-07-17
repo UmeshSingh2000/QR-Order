@@ -5,8 +5,8 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { io } from 'socket.io-client';
 import { useEffect } from 'react'
-
-const socket = io('http://localhost:3000');
+const Socket_url = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3000';
+const socket = io(Socket_url);
 const Orders = () => {
   const navigate = useNavigate()
   useEffect(() => {
