@@ -7,7 +7,7 @@ import { io } from 'socket.io-client';
 import {useParams} from 'react-router-dom';
 
 const baseURL = import.meta.env.VITE_BASE_URL;
-const socketurl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3000';
+const socketurl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3000'
 const socket = io(socketurl);
 
 function App() {
