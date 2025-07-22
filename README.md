@@ -65,3 +65,31 @@ npm run dev
 cd AminFrontend
 npm install
 npm run dev
+```
+## 🤝 Contributors
+
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/UmeshSingh2000">
+        <img src="https://avatars.githubusercontent.com/u/164480488?v=4" width="80px;" alt=""/>
+        <br />
+        <sub><b>Umesh Singh Mehta</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/CyberDemon2001">
+        <img src="https://avatars.githubusercontent.com/u/110963899?v=4" width="80px;" alt="" style="borderRadius:50px"/>
+        <br />
+        <sub><b>Vaibhav Tyagi</b></sub>
+      </a>
+    </td>
+<td align="center">
+      <a href="https://github.com/ramanchauhan13">
+        <img src="https://avatars.githubusercontent.com/u/118648695?v=4" width="80px;" alt="" style="borderRadius:50px"/>
+        <br />
+        <sub><b>Raman Chauhan</b></sub>
+      </a>
+    </td>
+  </tr>
+</table>
