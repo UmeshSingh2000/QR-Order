@@ -33,6 +33,7 @@ function App() {
   }, []);
 
 
+  
 
   const addToCart = (item, size) => {
     console.log("Adding to cart:", item.itemname, size);
