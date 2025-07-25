@@ -32,11 +32,21 @@ function App() {
     fetchMenu();
   }, []);
 
+  useEffect(() => {
+  // Load cart from local storage on initial mount
+  const storedCart = localStorage.getItem("cart");
+  if (storedCart) {
+    setCart(JSON.parse(storedCart));
+  }
+}, []);
 
-  
+useEffect(() => {
+  // Save cart to local storage whenever it updates
+  localStorage.setItem("cart", JSON.stringify(cart));
+}, [cart]);
+
 
   const addToCart = (item, size) => {
-    console.log("Adding to cart:", item.itemname, size);
     setCart((prevCart) => {
       const index = prevCart.findIndex(
         (entry) => entry.itemId === item._id && entry.size === size
@@ -92,11 +102,11 @@ function App() {
         totalAmount: getCartTotal(),
         tableNumber,
       });
-      console.log(response);
       if (response.status === 201) {
-         orderItemLive(tableNumber);
+        orderItemLive(tableNumber);
         toast.success("Order Placed Succefully");
         setCart([]);
+        localStorage.removeItem("cart");
         setShowCart(false);
       }
     } catch (error) {
@@ -111,6 +121,8 @@ function App() {
     id: section._id,
     name: section.sectionname,
   }));
+
+  
 
 return (
   <div className="bg-gradient-to-br from-orange-50 to-yellow-50 min-h-screen">

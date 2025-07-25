@@ -9,7 +9,6 @@ const menuSchema = mongoose.Schema({
     {
       itemname: {
         type: String,
-        
       },
       price: {
         type: Map,
